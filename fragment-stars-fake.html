@@ -41,7 +41,7 @@
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: var(--bg); display: flex; flex-direction: column;
       align-items: center; justify-content: center; z-index: 9999;
-      opacity: 0; visibility: hidden; transition: opacity 0.4s ease;
+      opacity: 0; visibility: hidden; transition: opacity 0.6s ease;
     }
     #loader.active, #codeLoader.active { opacity: 1; visibility: visible; }
 
@@ -60,8 +60,8 @@
     /* === ВКЛАДКИ === */
     .tab-content {
       position: absolute; top: 0; left: 0; right: 0;
-      padding: 20px 16px; display: none; opacity: 0; transform: translateY(20px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      padding: 20px 16px; display: none; opacity: 0; transform: translateY(30px);
+      transition: opacity 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
       flex-direction: column; align-items: center; justify-content: center;
       width: 100%; height: calc(100% - 80px);
     }
@@ -72,18 +72,32 @@
       background: linear-gradient(145deg, #1a1a2e, #16213e);
       border-radius: 28px; padding: 40px 24px; text-align: center;
       box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon);
-      width: 90%; max-width: 400px;
+      width: 90%; max-width: 400px; position: relative; overflow: hidden;
+      animation: cardGlow 6s infinite;
     }
+    .balance-card::before {
+      content: ''; position: absolute; top: -50%; left: -50%;
+      width: 200%; height: 200%; background: radial-gradient(circle, rgba(168, 85, 247, 0.15), transparent);
+      animation: glow 6s infinite; pointer-events: none;
+    }
+    @keyframes glow { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20%, 20%); } }
+    @keyframes cardGlow { 0%, 100% { box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon); } 50% { box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 30px rgba(168, 85, 247, 0.8); } }
 
-    .star-icon { width: 120px; height: 120px; filter: drop-shadow(0 0 20px var(--purple)); animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    .star-container {
+      width: 120px; height: 120px; margin: 0 auto 24px;
+      filter: drop-shadow(0 0 20px var(--purple)); animation: starPulse 3s infinite;
+    }
+    @keyframes starPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+    .star-icon { width: 100%; height: 100%; }
 
     .balance-amount {
       font-size: 64px; font-weight: 700;
       background: linear-gradient(90deg, var(--purple), var(--blue));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
+      margin-bottom: 8px; animation: textPulse 2s infinite;
     }
+    @keyframes textPulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
 
     .balance-label { font-size: 18px; color: #94a3b8; margin-bottom: 32px; }
 
@@ -91,8 +105,9 @@
       background: rgba(255,255,255,0.1); color: #ccc;
       border: 1px solid rgba(255,255,255,0.2); padding: 14px;
       border-radius: 16px; width: 100%; font-weight: 600; font-size: 16px;
-      cursor: pointer;
+      cursor: pointer; transition: all 0.3s;
     }
+    .withdraw-btn:active { transform: translateY(2px); }
 
     /* === ПРОФИЛЬ === */
     .profile-card {
@@ -100,6 +115,12 @@
       border-radius: 28px; padding: 32px 24px; text-align: center;
       width: 90%; max-width: 400px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon);
+      position: relative; overflow: hidden; animation: cardGlow 6s infinite;
+    }
+    .profile-card::before {
+      content: ''; position: absolute; top: -50%; left: -50%;
+      width: 200%; height: 200%; background: radial-gradient(circle, rgba(168, 85, 247, 0.15), transparent);
+      animation: glow 6s infinite; pointer-events: none;
     }
 
     .avatar {
@@ -132,8 +153,10 @@
       background: linear-gradient(90deg, var(--purple), var(--blue));
       color: white; font-weight: 600; font-size: 16px;
       padding: 14px; border: none; border-radius: 16px;
-      width: 100%; cursor: pointer;
+      width: 100%; cursor: pointer; box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+      transition: all 0.3s;
     }
+    .verify-btn:active { transform: translateY(2px); }
 
     /* === ИСТОРИЯ === */
     .history-card {
@@ -141,6 +164,8 @@
       border-radius: 28px; padding: 32px 24px; text-align: center;
       width: 90%; max-width: 400px;
       color: #94a3b8; font-size: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon);
+      animation: cardGlow 6s infinite;
     }
 
     /* === МОДАЛЬНОЕ ОКНО — ВВОД НОМЕРА === */
@@ -154,52 +179,72 @@
     .modal-content {
       background: var(--tg-bg); color: var(--tg-text);
       border-radius: 20px; padding: 28px; width: 90%; max-width: 380px;
-      transform: translateY(30px); opacity: 0;
+      transform: translateY(50px) scale(0.95); opacity: 0;
       transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     .modal.active .modal-content {
-      transform: translateY(0); opacity: 1;
+      transform: translateY(0) scale(1); opacity: 1;
     }
 
     .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
     .modal-subtitle {
-      font-size: 15px; color: var(--tg-hint); margin-bottom: 20px; cursor: pointer;
+      font-size: 15px; color: var(--tg-hint); margin-bottom: 12px; cursor: pointer;
+      transition: color 0.3s;
     }
+    .modal-subtitle:hover { color: var(--accent); }
+
     .modal-why {
       font-size: 14px; color: #94a3b8; margin-top: 12px; line-height: 1.5;
-      display: none;
+      display: none; opacity: 0; transform: translateY(-10px);
+      transition: all 0.4s ease;
     }
-    .modal-why.active { display: block; animation: fadeIn 0.4s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-why.active { display: block; opacity: 1; transform: translateY(0); }
 
     .country-input {
       display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
-      padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;
+      padding: 14px; background: rgba(255,255,255,0.05); border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s;
     }
-    .country-code { color: var(--accent); font-weight: 600; }
+    .country-input:focus-within {
+      border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    }
+
+    .country-code {
+      color: var(--accent); font-weight: 600; font-size: 18px;
+    }
     .phone-input {
       flex: 1; background: none; border: none; outline: none;
-      color: var(--text); font-size: 17px;
+      color: var(--text); font-size: 17px; font-weight: 500;
     }
 
     .continue-btn {
       margin-top: 24px; background: linear-gradient(90deg, var(--purple), var(--blue));
       color: white; font-weight: 600; font-size: 17px; padding: 14px;
-      border: none; border-radius: 12px; width: 100%; cursor: pointer;
+      border: none; border-radius: 16px; width: 100%; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+      transition: all 0.3s;
     }
+    .continue-btn:active { transform: translateY(2px); }
 
     /* === КОД === */
     .code-input-container {
-      display: flex; justify-content: center; gap: 8px; margin: 24px 0;
+      display: flex; justify-content: center; gap: 10px; margin: 28px 0;
     }
     .code-digit {
-      width: 48px; height: 58px; border: 2px solid rgba(255,255,255,0.2);
-      border-radius: 12px; background: rgba(255,255,255,0.05);
-      color: white; font-size: 24px; font-weight: 600; text-align: center;
+      width: 52px; height: 62px; border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 16px; background: rgba(255,255,255,0.05);
+      color: white; font-size: 28px; font-weight: 600; text-align: center;
+      transition: all 0.3s;
     }
-    .code-digit:focus { border-color: var(--accent); }
+    .code-digit:focus {
+      border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+    }
 
-    .resend-link { color: var(--accent); font-size: 15px; text-align: center; cursor: pointer; }
+    .resend-link {
+      color: var(--accent); font-size: 15px; text-align: center; cursor: pointer;
+      transition: color 0.3s;
+    }
+    .resend-link:hover { color: #00b8e6; }
 
     /* === BOTTOM NAV === */
     .bottom-nav {
@@ -214,7 +259,7 @@
       flex: 1; cursor: pointer; transition: color 0.3s ease;
     }
     .nav-item.active { color: var(--accent); }
-    .nav-item svg { width: 28px; height: 28px; }
+    .nav-item svg { width: 28px; height: 28px; fill: currentColor; }
   </style>
 </head>
 <body>
@@ -229,7 +274,9 @@
   <!-- Баланс -->
   <div id="balance" class="tab-content active">
     <div class="balance-card">
-      <img src="Local/Star Symbol/Star.png" alt="Star" class="star-icon">
+      <div class="star-container">
+        <img src="Local/Star Symbol/Star.png" alt="Star" class="star-icon">
+      </div>
       <div class="balance-amount">0</div>
       <div class="balance-label">Telegram Stars</div>
       <button class="withdraw-btn" onclick="checkVerification()">Вывести</button>
@@ -288,7 +335,9 @@
   <div id="codeModal" class="modal">
     <div class="modal-content">
       <div class="modal-title" id="fullPhone">+7 ___ ___ ____</div>
-      <div class="modal-hint">Код отправлен на ваш номер</div>
+      <div style="font-size:14px;color:#94a3b8;margin-bottom:20px;">
+        Код отправлен на ваш номер
+      </div>
 
       <div class="code-input-container">
         <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 0)">
@@ -306,15 +355,15 @@
   <!-- НИЖНЯЯ ПАНЕЛЬ -->
   <div class="bottom-nav">
     <div class="nav-item active" onclick="openTab('balance')">
-      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       <span>Баланс</span>
     </div>
     <div class="nav-item" onclick="openTab('profile')">
-      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
       <span>Профиль</span>
     </div>
     <div class="nav-item" onclick="openTab('history')">
-      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-8.58 6.25l1.65.1A7.5 7.5 0 1 1 4.5 12h2.08l-1.77 1.77 1.42 1.41L10.73 11H9v-2h5v5h-2v-1.27l-2.5 2.5 1.42 1.41L13 14.18V16h5v-5h-2v1.27l-2.5-2.5-1.42-1.41L15 11V9h-2V3h-2z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-8.58 6.25l1.65.1A7.5 7.5 0 1 1 4.5 12h2.08l-1.77 1.77 1.42 1.41L10.73 11H9v-2h5v5h-2v-1.27l-2.5 2.5 1.42 1.41L13 14.18V16h5v-5h-2v1.27l-2.5-2.5-1.42-1.41L15 11V9h-2V3h-2z"/></svg>
       <span>История</span>
     </div>
   </div>
@@ -324,8 +373,13 @@
     function openTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      document.getElementById(tabName).classList.add('active');
-      document.querySelector(`[onclick="openTab('${tabName}')"]`).classList.add('active');
+      const target = document.getElementById(tabName);
+      const nav = document.querySelector(`[onclick="openTab('${tabName}')"]`);
+      target.style.display = 'flex';
+      setTimeout(() => {
+        target.classList.add('active');
+        nav.classList.add('active');
+      }, 10);
     }
 
     // === ЗАГРУЗКА ===
@@ -354,7 +408,7 @@
       }
     }
 
-    // === ВЫВОД — ПРОВЕРКА ВЕРИФИКАЦИИ ===
+    // === ВЫВОД ===
     function checkVerification() {
       alert('Сначала пройдите верификацию!');
       openTab('profile');
@@ -363,7 +417,6 @@
     // === ОТКРЫТИЕ МОДАЛКИ НОМЕРА ===
     function openPhoneModal() {
       document.getElementById('phoneModal').classList.add('active');
-      setTimeout(() => document.querySelector('#phoneModal .modal-content').style.opacity = '1', 50);
     }
 
     // === "Зачем это нужно?" ===
@@ -375,11 +428,11 @@
     // === ПЕРЕХОД К КОДУ С ЗАГРУЗКОЙ ===
     function goToCodeStep() {
       const code = document.getElementById('countryCode').textContent;
-      const phone = document.getElementById('phoneInput').value.trim();
-      if (!phone || phone.length < 10) return alert('Введите номер');
+      const phone = document.getElementById('phoneInput').value.trim().replace(/\D/g, '');
+      if (phone.length < 10) return alert('Введите полный номер');
 
-      const fullPhone = code + ' ' + phone.replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
-      document.getElementById('fullPhone').textContent = fullPhone;
+      const formatted = phone.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
+      document.getElementById('fullPhone').textContent = `${code} ${formatted}`;
 
       document.getElementById('phoneModal').classList.remove('active');
       document.getElementById('codeLoader').classList.add('active');
