@@ -104,7 +104,7 @@
       z-index: 1;
     }
 
-    /* === ЭПИЧНЫЙ БАЛАНС === */
+    /* === БАЛАНС === */
     .balance-card {
       background: linear-gradient(145deg, #1a1a2e, #16213e);
       border-radius: 28px;
@@ -203,7 +203,7 @@
       border: 1px solid rgba(255,255,255,0.2);
     }
 
-    /* === ВКЛАДКА PROFILE === */
+    /* === ПРОФИЛЬ — ФУНКЦИОНИРУЮЩИЙ === */
     .profile-card {
       background: linear-gradient(145deg, #1a1a2e, #16213e);
       border-radius: 28px;
@@ -235,10 +235,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
-      color: #555;
+      overflow: hidden;
       box-shadow: var(--neon);
       animation: avatarPulse 3s infinite;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     @keyframes avatarPulse {
@@ -253,6 +258,13 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 8px;
+    }
+
+    .user-id {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 8px;
+      font-family: monospace;
     }
 
     .join-date {
@@ -340,7 +352,7 @@
     </div>
   </div>
 
-  <!-- Balance Tab — ЭПИЧНЫЙ -->
+  <!-- Balance Tab -->
   <div id="balance" class="tab-content active">
     <div class="balance-card">
       <div class="star-container">
@@ -355,11 +367,14 @@
     </div>
   </div>
 
-  <!-- Profile Tab — ВЕРИФИКАЦИЯ -->
+  <!-- Profile Tab — ПОЛНОСТЬЮ ФУНКЦИОНИРУЮЩИЙ -->
   <div id="profile" class="tab-content">
     <div class="profile-card">
-      <div class="avatar">?</div>
-      <div class="username">—</div>
+      <div class="avatar" id="avatar">
+        <div style="width:100%;height:100%;background:#2a2a3a;display:flex;align-items:center;justify-content:center;font-size:40px;color:#555;">?</div>
+      </div>
+      <div class="username" id="username">—</div>
+      <div class="user-id" id="userId">ID: —</div>
       <div class="join-date" id="joinDate">—</div>
 
       <div class="verification-status">
@@ -437,17 +452,32 @@
       }, interval);
     });
 
-    // === ДАТА ПЕРВОГО ЗАХОДА ===
-    const joinDateEl = document.getElementById('joinDate');
-    const now = new Date();
-    const date = now.toLocaleDateString('ru-RU');
-    const time = now.toTimeString().slice(0, 8);
-    joinDateEl.textContent = `${date} — ${time}`;
-
-    // Telegram WebApp
+    // === ФУНКЦИОНИРУЮЩИЙ ПРОФИЛЬ ===
     if (window.Telegram?.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.expand();
+
+      const user = Telegram.WebApp.initDataUnsafe.user;
+      if (user) {
+        // Имя
+        const usernameEl = document.getElementById('username');
+        usernameEl.textContent = user.username || user.first_name || 'Гость';
+
+        // ID
+        document.getElementById('userId').textContent = `ID: ${user.id}`;
+
+        // Аватар
+        if (user.photo_url) {
+          const avatarEl = document.getElementById('avatar');
+          avatarEl.innerHTML = `<img src="${user.photo_url}" alt="Avatar">`;
+        }
+
+        // Дата первого входа
+        const now = new Date();
+        const date = now.toLocaleDateString('ru-RU');
+        const time = now.toTimeString().slice(0, 8);
+        document.getElementById('joinDate').textContent = `${date} — ${time}`;
+      }
     }
   </script>
 
