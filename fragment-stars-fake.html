@@ -44,10 +44,11 @@
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: var(--bg); display: flex; flex-direction: column;
       align-items: center; justify-content: center; z-index: 9999;
-      opacity: 1; visibility: visible; transition: opacity 0.6s ease;
-    }
-    #loader.fade-out, #codeLoader.fade-out {
       opacity: 0; visibility: hidden;
+      transition: opacity 0.6s ease;
+    }
+    #loader.active, #codeLoader.active {
+      opacity: 1; visibility: visible;
     }
 
     .spinner {
@@ -213,10 +214,17 @@
       border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
     }
 
-    .country-code {
-      color: var(--accent); font-weight: 600; font-size: 18px; width: 40px;
-      text-align: center;
+    .country-code-wrapper {
+      position: relative; width: 50px;
     }
+    .country-plus {
+      color: var(--accent); font-weight: 600; font-size: 18px; position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+    }
+    .country-code {
+      background: none; border: none; outline: none; color: var(--accent); font-weight: 600; font-size: 18px;
+      width: 100%; padding-left: 18px; text-align: left;
+    }
+
     .phone-input {
       flex: 1; background: none; border: none; outline: none;
       color: var(--text); font-size: 17px; font-weight: 500;
@@ -320,7 +328,10 @@
       </div>
 
       <div class="country-input">
-        <input type="text" class="country-code" id="countryCode" value="+7" maxlength="4" inputmode="numeric">
+        <div class="country-code-wrapper">
+          <span class="country-plus">+</span>
+          <input type="text" class="country-code" id="countryCode" value="7" maxlength="3" inputmode="numeric" oninput="filterCountryCode(this)">
+        </div>
         <input type="tel" class="phone-input" id="phoneInput" placeholder="___ ___ ____" inputmode="numeric">
       </div>
 
@@ -344,11 +355,11 @@
       </div>
 
       <div class="code-input-container">
-        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="moveToNext(this, 0); filterDigits(this)">
-        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="moveToNext(this, 1); filterDigits(this)">
-        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="moveToNext(this, 2); filterDigits(this)">
-        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="moveToNext(this, 3); filterDigits(this)">
-        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" oninput="moveToNext(this, 4); filterDigits(this)">
+        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 0); filterDigits(this)">
+        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 1); filterDigits(this)">
+        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 2); filterDigits(this)">
+        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 3); filterDigits(this)">
+        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 4); filterDigits(this)">
       </div>
 
       <div class="resend-link" onclick="resendCode()">Отправить код повторно</div>
@@ -373,7 +384,7 @@
   </div>
 
   <script>
-    // === ПЛАВНОЕ ПОЯВЛЕНИЕ ИНТЕРФЕЙСА ===
+    // === ПЛАВНАЯ ЗАГРУЗКА ===
     window.addEventListener('load', () => {
       const progress = document.getElementById('progress');
       const loader = document.getElementById('loader');
@@ -385,18 +396,17 @@
         if (current >= 100) {
           clearInterval(timer);
           setTimeout(() => {
-            loader.classList.add('fade-out');
+            loader.classList.remove('active');
             setTimeout(() => {
-              loader.style.display = 'none';
               document.body.classList.add('loaded');
               openTab('balance');
-            }, 600);
+            }, 100);
           }, 300);
         }
       }, 20);
     });
 
-    // === ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ===
+    // === ТЕЛЕГРАМ ===
     if (window.Telegram?.WebApp) {
       Telegram.WebApp.ready(); Telegram.WebApp.expand();
       const user = Telegram.WebApp.initDataUnsafe.user;
@@ -408,7 +418,7 @@
       }
     }
 
-    // === ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ===
+    // === ВКЛАДКИ ===
     function openTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -427,43 +437,48 @@
       openTab('profile');
     }
 
-    // === ОТКРЫТИЕ МОДАЛКИ НОМЕРА ===
+    // === МОДАЛКА НОМЕРА ===
     function openPhoneModal() {
       document.getElementById('phoneModal').classList.add('active');
     }
 
-    // === "Зачем это нужно?" ===
+    // === "Зачем?" ===
     function toggleWhy() {
       document.getElementById('whyText').classList.toggle('active');
     }
 
-    // === ФИЛЬТР ТОЛЬКО ЦИФР ===
+    // === ФИЛЬТР КОДА СТРАНЫ (ТОЛЬКО ЦИФРЫ, ПЛЮС НЕЛЬЗЯ УДАЛИТЬ) ===
+    function filterCountryCode(input) {
+      input.value = input.value.replace(/\D/g, '');
+      if (!input.value) input.value = '7';
+    }
+
+    // === ФИЛЬТР ЦИФР ===
     function filterDigits(input) {
       input.value = input.value.replace(/\D/g, '');
     }
 
-    // === ПЕРЕХОД К КОДУ — 100% РАБОЧИЙ LOADER ===
+    // === ПЕРЕХОД К КОДУ ===
     function goToCodeStep() {
       const code = document.getElementById('countryCode').value.trim();
       const phone = document.getElementById('phoneInput').value.trim().replace(/\D/g, '');
-      if (!code || code.length < 1 || code.length > 4 || !/^\+\d+$/.test(code)) return alert('Код страны: + и до 3 цифр');
+      if (!code || code.length === 0) return alert('Введите код страны');
       if (phone.length < 10) return alert('Введите полный номер');
 
       const formatted = phone.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
-      document.getElementById('fullPhone').textContent = `${code} ${formatted}`;
+      document.getElementById('fullPhone').textContent = `+${code} ${formatted}`;
 
       document.getElementById('phoneModal').classList.remove('active');
 
       const codeLoader = document.getElementById('codeLoader');
+      codeLoader.classList.remove('active');
       codeLoader.style.display = 'flex';
-      codeLoader.classList.remove('fade-out');
       setTimeout(() => codeLoader.classList.add('active'), 10);
 
       const progress = document.getElementById('codeProgress');
       let current = 0;
       const duration = 500 + Math.random() * 1500;
-      const steps = 50;
-      const interval = duration / steps;
+      const interval = duration / 50;
 
       const timer = setInterval(() => {
         current += 2;
@@ -471,17 +486,16 @@
         if (current >= 100) {
           clearInterval(timer);
           setTimeout(() => {
-            codeLoader.classList.add('fade-out');
+            codeLoader.classList.remove('active');
             setTimeout(() => {
-              codeLoader.style.display = 'none';
               document.getElementById('codeModal').classList.add('active');
-            }, 600);
+            }, 100);
           }, 300);
         }
       }, interval);
     }
 
-    // === ВВОД КОДА ===
+    // === КОД ===
     function moveToNext(input, index) {
       filterDigits(input);
       if (input.value.length === 1 && index < 4) {
@@ -499,15 +513,6 @@
       alert('Верификация пройдена!');
       document.getElementById('codeModal').classList.remove('active');
     }
-
-    // === ЗАЩИТА ОТ ЗАВИСАНИЯ ===
-    setTimeout(() => {
-      if (document.getElementById('loader').style.display !== 'none') {
-        document.getElementById('loader').style.display = 'none';
-        document.body.classList.add('loaded');
-        openTab('balance');
-      }
-    }, 6000);
   </script>
 </body>
 </html>
