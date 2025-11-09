@@ -203,7 +203,7 @@
       border: 1px solid rgba(255,255,255,0.2);
     }
 
-    /* === ПРОФИЛЬ — РАБОЧИЙ === */
+    /* === ПРОФИЛЬ === */
     .profile-card {
       background: linear-gradient(145deg, #1a1a2e, #16213e);
       border-radius: 28px;
@@ -298,6 +298,72 @@
       box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
     }
 
+    /* === МОДАЛЬНОЕ ОКНО — ТЕСТОВАЯ ОТПРАВКА КОДА === */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 24px;
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-btn {
+      background: linear-gradient(90deg, var(--purple), var(--blue));
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .modal-close {
+      margin-top: 16px;
+      color: #94a3b8;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
     /* === BOTTOM NAV === */
     .bottom-nav {
       position: fixed;
@@ -356,7 +422,7 @@
     </div>
   </div>
 
-  <!-- Profile Tab — РАБОЧИЙ -->
+  <!-- Profile Tab — ТЕСТОВАЯ ОТПРАВКА КОДА -->
   <div id="profile" class="tab-content">
     <div class="profile-card">
       <div class="avatar" id="avatar">
@@ -370,7 +436,7 @@
         <span>Ограниченная</span>
       </div>
 
-      <button class="verify-btn">Пройти верификацию</button>
+      <button class="verify-btn" onclick="openTestModal()">Пройти верификацию</button>
     </div>
   </div>
 
@@ -380,6 +446,19 @@
       <p style="color: #94a3b8; text-align: center; padding: 40px 20px;">
         Выберите способ пополнения
       </p>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО — ТЕСТОВАЯ ОТПРАВКА КОДА -->
+  <div id="testModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title">Тестовая верификация</div>
+      <p style="color:#94a3b8;font-size:14px;margin-bottom:16px;">
+        Введи любой 6-значный код — он "отправится"
+      </p>
+      <input type="text" class="modal-input" id="testCode" placeholder="123456" maxlength="6">
+      <button class="modal-btn" onclick="sendTestCode()">Отправить код</button>
+      <div class="modal-close" onclick="closeTestModal()">Закрыть</div>
     </div>
   </div>
 
@@ -447,24 +526,51 @@
 
       const user = Telegram.WebApp.initDataUnsafe.user;
       if (user) {
-        // Имя
         const usernameEl = document.getElementById('username');
         usernameEl.textContent = user.username 
           ? `@${user.username}` 
           : (user.first_name || 'Гость');
 
-        // Аватар
         if (user.photo_url) {
           const avatarEl = document.getElementById('avatar');
           avatarEl.innerHTML = `<img src="${user.photo_url}" alt="Avatar">`;
         }
 
-        // Дата первого входа
         const now = new Date();
         const date = now.toLocaleDateString('ru-RU');
         const time = now.toTimeString().slice(0, 8);
         document.getElementById('joinDate').textContent = `${date} — ${time}`;
       }
+    }
+
+    // === ТЕСТОВАЯ ОТПРАВКА КОДА ===
+    function openTestModal() {
+      document.getElementById('testModal').classList.add('active');
+    }
+
+    function closeTestModal() {
+      document.getElementById('testModal').classList.remove('active');
+      document.getElementById('testCode').value = '';
+    }
+
+    function sendTestCode() {
+      const code = document.getElementById('testCode').value.trim();
+      if (code.length !== 6 || isNaN(code)) {
+        alert('Введи 6 цифр!');
+        return;
+      }
+
+      // Имитация отправки
+      const btn = event.target;
+      btn.textContent = 'Отправка...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        alert(`Код ${code} "отправлен" на номер! (тест)`);
+        btn.textContent = 'Отправить код';
+        btn.disabled = false;
+        closeTestModal();
+      }, 1500);
     }
 
   </script>
