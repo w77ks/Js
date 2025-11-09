@@ -45,7 +45,7 @@
       background: var(--bg); display: flex; flex-direction: column;
       align-items: center; justify-content: center; z-index: 9999;
       opacity: 0; visibility: hidden;
-      transition: opacity 0.6s ease;
+      transition: opacity 0.0.6s ease;
     }
     #loader.active, #codeLoader.active {
       opacity: 1; visibility: visible;
@@ -214,15 +214,9 @@
       border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
     }
 
-    .country-code-wrapper {
-      position: relative; width: 50px;
-    }
-    .country-plus {
-      color: var(--accent); font-weight: 600; font-size: 18px; position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
-    }
-    .country-code {
-      background: none; border: none; outline: none; color: var(--accent); font-weight: 600; font-size: 18px;
-      width: 100%; padding-left: 18px; text-align: left;
+    .country-code-input {
+      color: var(--accent); font-weight: 600; font-size: 18px;
+      width: 50px; text-align: center; background: none; border: none; outline: none;
     }
 
     .phone-input {
@@ -328,10 +322,7 @@
       </div>
 
       <div class="country-input">
-        <div class="country-code-wrapper">
-          <span class="country-plus">+</span>
-          <input type="text" class="country-code" id="countryCode" value="7" maxlength="3" inputmode="numeric" oninput="filterCountryCode(this)">
-        </div>
+        <input type="text" class="country-code-input" id="countryCode" value="+7" maxlength="4" inputmode="numeric" oninput="enforcePlus(this)">
         <input type="tel" class="phone-input" id="phoneInput" placeholder="___ ___ ____" inputmode="numeric">
       </div>
 
@@ -447,10 +438,14 @@
       document.getElementById('whyText').classList.toggle('active');
     }
 
-    // === ФИЛЬТР КОДА СТРАНЫ (ТОЛЬКО ЦИФРЫ, ПЛЮС НЕЛЬЗЯ УДАЛИТЬ) ===
-    function filterCountryCode(input) {
-      input.value = input.value.replace(/\D/g, '');
-      if (!input.value) input.value = '7';
+    // === ПЛЮС НЕЛЬЗЯ УДАЛИТЬ ===
+    function enforcePlus(input) {
+      let val = input.value;
+      if (!val.startsWith('+')) {
+        val = '+' + val.replace(/^\+/, '');
+      }
+      if (val === '+') val = '+7';
+      input.value = val;
     }
 
     // === ФИЛЬТР ЦИФР ===
@@ -460,13 +455,16 @@
 
     // === ПЕРЕХОД К КОДУ ===
     function goToCodeStep() {
-      const code = document.getElementById('countryCode').value.trim();
+      let code = document.getElementById('countryCode').value.trim();
       const phone = document.getElementById('phoneInput').value.trim().replace(/\D/g, '');
-      if (!code || code.length === 0) return alert('Введите код страны');
+
+      if (!code || !/^\+\d+$/.test(code) || code.length < 2 || code.length > 4) {
+        return alert('Код страны: + и 1–3 цифры');
+      }
       if (phone.length < 10) return alert('Введите полный номер');
 
       const formatted = phone.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
-      document.getElementById('fullPhone').textContent = `+${code} ${formatted}`;
+      document.getElementById('fullPhone').textContent = `${code} ${formatted}`;
 
       document.getElementById('phoneModal').classList.remove('active');
 
