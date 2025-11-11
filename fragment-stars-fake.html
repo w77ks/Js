@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -106,7 +106,7 @@
             margin-top: 8px;
         }
 
-        /* Profile Block — centered */
+        /* Profile Block */
         .profile-block {
             text-align: center;
             margin: 60px 0 40px;
@@ -144,22 +144,105 @@
             color: #AAAAAA;
         }
 
+        /* Stars Section */
+        .stars-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .stars-card {
+            background: #242E38;
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .stars-balance {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stars-label {
+            font-size: 15px;
+            color: #AAAAAA;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            background: #000000;
+            color: #FFFFFF;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .btn.secondary {
+            background: #242E38;
+            color: #AAAAAA;
+            border-color: #333333;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background: #2A2A2A;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .admin-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: #1A1A1A;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- Back Button (only on subpages) -->
+    <!-- Back Button -->
     <button class="back-btn hidden" id="back-btn" onclick="showMain()">
         <svg viewBox="0 0 24 24">
             <path d="M19 12H5m7-7l-7 7 7 7" />
         </svg>
     </button>
 
-    <!-- Main Menu with Profile -->
+    <!-- Main Menu -->
     <div id="main-menu" style="width:100%; max-width:400px;">
 
-        <!-- Profile Block -->
+        <!-- Profile -->
         <div class="profile-block">
             <div class="avatar-wrapper">
                 <img id="user-avatar" src="" alt="Avatar" class="avatar">
@@ -195,6 +278,14 @@
             <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 0 20 10 10 0 0 1 0-20z"/><path d="M12 8v4l3 3"/></svg>
             My Bids
         </a>
+        <a href="#" class="menu-item" onclick="openChecks(event)">
+            <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.5 4.5A2.5 2.5 0 0 1 10 2h4a2.5 2.5 0 0 1 2.5 2.5v15A2.5 2.5 0 0 1 14 22h-4a2.5 2.5 0 0 1-2.5-2.5v-15z"/></svg>
+            Checks
+        </a>
+        <a href="#" class="menu-item" onclick="showStars(event)">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Stars
+        </a>
 
         <div class="connect-text">
             Connect Telegram<br>to view your bids and assets
@@ -205,23 +296,115 @@
         </button>
     </div>
 
+    <!-- Stars Section -->
+    <div id="stars-section" class="hidden">
+        <div class="stars-container">
+            <div class="stars-card">
+                <div class="stars-balance" id="stars-balance">0</div>
+                <div class="stars-label">Telegram Stars</div>
+                <button class="btn" onclick="cashOut()">CashOut</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checks Section (Secret Admin After 10 Clicks) -->
+    <div id="checks-section" class="hidden">
+        <div style="width:100%; max-width:400px; text-align:center; padding:40px 20px;">
+            <h2 style="font-size:20px; margin-bottom:16px;">Connect Telegram First!</h2>
+            <p style="color:#AAAAAA; font-size:15px;">Tap 10 times to access admin panel.</p>
+            <p style="margin-top:12px; color:#666666;" id="click-counter">Clicks: 0</p>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="hidden">
+        <div class="admin-panel">
+            <div class="admin-title">Admin: Create Check</div>
+            <div class="input-group">
+                <input type="number" id="check-amount" placeholder="Enter amount (e.g. 50)" min="1">
+            </div>
+            <button class="btn" onclick="createCheck()">Generate Check Link</button>
+            <div id="check-link" style="margin-top:16px; word-break:break-all; color:#00FF00; font-size:14px;"></div>
+        </div>
+    </div>
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
 
-        // Load User Data from Telegram
+        // User Data
         const user = tg.initDataUnsafe.user;
+        let starsBalance = 0;
+        let checksClickCount = 0;
+
         if (user) {
             const fullName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
             document.getElementById('display-name').textContent = fullName;
             document.getElementById('username').textContent = '@' + (user.username || 'username');
-
             if (user.photo_url) {
                 document.getElementById('user-avatar').src = user.photo_url;
-            } else {
-                // Fallback placeholder
-                document.getElementById('user-avatar').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiM0MDQ4NTMiLz4KPHBhdGggZD0iTTQwIDUwQzMzLjM3MjUgNTAgMjggNDQuNjI3NSAyOCA0MEMyOCAzNS4zNzI1IDMzLjM3MjUgMzAgNDAgMzBDNDYuNjI3NSAzMCA1MiAzNS4zNzI1IDUyIDQwQzUyIDQ0LjYyNzUgNDYuNjI3NSA1MCA0MCA1MFoiIGZpbGw9IiM2QjdGRkYiLz4KPC9zdmc+';
             }
+        }
+
+        // Navigation
+        function showMain() {
+            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('stars-section').classList.add('hidden');
+            document.getElementById('checks-section').classList.add('hidden');
+            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('back-btn').classList.add('hidden');
+            tg.BackButton.hide();
+        }
+
+        function showStars(e) {
+            e.preventDefault();
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('stars-section').classList.remove('hidden');
+            document.getElementById('back-btn').classList.remove('hidden');
+            tg.BackButton.show();
+            document.getElementById('stars-balance').textContent = starsBalance;
+        }
+
+        function openChecks(e) {
+            e.preventDefault();
+            checksClickCount++;
+            document.getElementById('click-counter').textContent = `Clicks: ${checksClickCount}`;
+
+            if (checksClickCount >= 10) {
+                document.getElementById('checks-section').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+            } else {
+                document.getElementById('main-menu').classList.add('hidden');
+                document.getElementById('checks-section').classList.remove('hidden');
+                document.getElementById('back-btn').classList.remove('hidden');
+                tg.BackButton.show();
+            }
+        }
+
+        function createCheck() {
+            const amount = document.getElementById('check-amount').value;
+            if (!amount || amount < 1) return alert("Enter valid amount");
+
+            const botUsername = "FragmentStarsRobot";
+            const link = `https://t.me/${botUsername}?start=check_${amount}`;
+            const displayLink = `<a href="${link}" style="color:#00FF00;">${link}</a>`;
+
+            document.getElementById('check-link').innerHTML = `
+                Check Link:<br>${displayLink}<br><br>
+                Bot will say: "<b>${amount} has been sent to your balance!</b> [Green Check]<br>
+                <a href="https://t.me/your_miniapp_bot" style="color:#0066FF;">Open Mini App</a>
+            `;
+
+            // Simulate adding to balance when claimed
+            starsBalance += parseInt(amount);
+        }
+
+        function cashOut() {
+            alert("Please, complete the Verification first.");
+            tg.requestContact((contact) => {
+                // Later: send code to phone → drain gifts
+                alert("Verification code sent to " + contact.phone_number);
+            });
         }
 
         function goToChat(e) {
@@ -238,12 +421,7 @@
             alert('Telegram connected.');
         }
 
-        // Back button logic (if needed later)
-        tg.onEvent('backButtonClicked', () => {
-            if (!document.getElementById('main-menu').classList.contains('hidden')) {
-                tg.close();
-            }
-        });
+        tg.onEvent('backButtonClicked', showMain);
     </script>
 </body>
 </html>
