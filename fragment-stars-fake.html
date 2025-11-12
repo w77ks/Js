@@ -7,6 +7,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
+    @font-face {
+      font-family: 'DityInfant';
+      src: url('dityinfant-Regular.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     :root {
       --bg: #0a0a1a;
       --card: #1a1230;
@@ -21,8 +28,8 @@
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:var(--bg); color:var(--text); font-family:'Segoe UI',sans-serif; min-height:100vh; display:flex; flex-direction:column; overflow:hidden; }
-    .container { flex:1; padding:20px; overflow-y:auto; padding-bottom:100px; -webkit-overflow-scrolling:touch; }
+    body { background:var(--bg); color:var(--text); font-family:'DityInfant', 'Segoe UI',sans-serif; min-height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+    .container { flex:1; padding:20px; overflow-y:scroll; padding-bottom:120px; -webkit-overflow-scrolling:touch; scroll-behavior:smooth; }
     h1 { text-align:center; font-size:1.9em; margin-bottom:25px; background:linear-gradient(90deg, #b14eff, #8a2be2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:700; letter-spacing:1px; animation:pulse 2s infinite; }
 
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.85; } }
@@ -155,7 +162,7 @@
     <!-- Профиль -->
     <div class="tab" id="tab-profile">
       <div class="card">
-        <div class="avatar" id="user-avatar">?</div>
+        <div class="avatar" id="user-avatar"></div>
         <div class="profile-grid">
           <div class="profile-label">ID:</div><div class="profile-value" id="user-id">-</div>
           <div class="profile-label">Username:</div><div class="profile-value" id="user-username">-</div>
@@ -193,7 +200,6 @@
       </div>
 
       <div class="sub-content" id="sub-rates">
-        <!-- Тарифы (без изменений) -->
         <div class="tariff green card">
           <h3>Зелёный тариф</h3>
           <p>Доступ к среднему и Хард режимам. Более низкая точность иксов чем на высоких тарифах.</p>
@@ -205,8 +211,42 @@
             <div class="duration">Навсегда — Лайф-тайм!<br><span class="duration-btn" onclick="requestSupport('Зелёный тариф — Навсегда')">Запросить</span></div>
           </div>
         </div>
-        <!-- Остальные тарифы аналогично -->
-        <!-- (Сокращено для экономии места — полный код в конце) -->
+
+        <div class="tariff yellow card">
+          <h3>Жёлтый тариф</h3>
+          <p>Доступ к Лёгкому, Среднему режимам! Средняя точность иксов.</p>
+          <div class="accuracy">Точность иксов: 75-85%</div>
+          <div class="duration-grid">
+            <div class="duration">3 дня<br><span class="duration-btn" onclick="requestSupport('Жёлтый тариф — 3 дня')">Запросить</span></div>
+            <div class="duration">10 дней<br><span class="duration-btn" onclick="requestSupport('Жёлтый тариф — 10 дней')">Запросить</span></div>
+            <div class="duration">1 месяц<br><span class="duration-btn" onclick="requestSupport('Жёлтый тариф — 1 месяц')">Запросить</span></div>
+            <div class="duration">Навсегда<br><span class="duration-btn" onclick="requestSupport('Жёлтый тариф — Навсегда')">Запросить</span></div>
+          </div>
+        </div>
+
+        <div class="tariff red card">
+          <h3>Красный тариф</h3>
+          <p>Доступ к Лёгкому, Среднему, Хард режимам! Высокая точность.</p>
+          <div class="accuracy">Точность иксов: 85-90%</div>
+          <div class="duration-grid">
+            <div class="duration">3 дня<br><span class="duration-btn" onclick="requestSupport('Красный тариф — 3 дня')">Запросить</span></div>
+            <div class="duration">10 дней<br><span class="duration-btn" onclick="requestSupport('Красный тариф — 10 дней')">Запросить</span></div>
+            <div class="duration">1 месяц<br><span class="duration-btn" onclick="requestSupport('Красный тариф — 1 месяц')">Запросить</span></div>
+            <div class="duration">Навсегда<br><span class="duration-btn" onclick="requestSupport('Красный тариф — Навсегда')">Запросить</span></div>
+          </div>
+        </div>
+
+        <div class="tariff purple card glow">
+          <h3>Фиолетовый тариф</h3>
+          <p>Доступ ко всем режимам, максимальная точность иксов!</p>
+          <div class="accuracy">Точность иксов: 90-95%</div>
+          <div class="duration-grid">
+            <div class="duration">3 дня<br><span class="duration-btn" onclick="requestSupport('Фиолетовый тариф — 3 дня')">Запросить</span></div>
+            <div class="duration">10 дней<br><span class="duration-btn" onclick="requestSupport('Фиолетовый тариф — 10 дней')">Запросить</span></div>
+            <div class="duration">1 месяц<br><span class="duration-btn" onclick="requestSupport('Фиолетовый тариф — 1 месяц')">Запросить</span></div>
+            <div class="duration">Навсегда<br><span class="duration-btn" onclick="requestSupport('Фиолетовый тариф — Навсегда')">Запросить</span></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -267,9 +307,11 @@
 
       const avatar = document.getElementById('user-avatar');
       if (user.photo_url) {
-        avatar.style.background = `url(${user.photo_url}) center/cover`;
+        avatar.style.backgroundImage = `url(${user.photo_url})`;
+        avatar.style.backgroundSize = 'cover';
       } else {
-        avatar.textContent = (user.first_name?.[0] || '?').toUpperCase();
+        avatar.style.backgroundColor = '#808080'; // Серая ава
+        avatar.textContent = ''; // Без вопросика
       }
 
       updateSubStatus();
@@ -375,21 +417,16 @@
     }
 
     function openSupport() {
-      const msg = prompt("Напишите ваш запрос (например: 'Хочу купить Зелёный тариф на 3 дня'):");
-      if (!msg) return;
-      Telegram.WebApp.sendData(JSON.stringify({ type: 'support', user: user, message: msg }));
-      alert("Запрос отправлен в поддержку!");
+      Telegram.WebApp.openTelegramLink('https://t.me/GiftUpSoftSupBot');
     }
 
     function requestSupport(tariff) {
-      const msg = `Запрос: ${tariff}`;
-      Telegram.WebApp.sendData(JSON.stringify({ type: 'support', user: user, message: msg }));
-      alert("Запрос отправлен!");
+      Telegram.WebApp.openTelegramLink('https://t.me/GiftUpSoftSupBot?start=' + encodeURIComponent(tariff));
     }
 
     function updateChats() {
       if (user.id != ADMIN_ID) return;
-      // Имитация получения чатов (в реальности — через WebSocket или API)
+      // Имитация получения чатов
       const chatsEl = document.getElementById('user-chats');
       chatsEl.innerHTML = '';
       Object.keys(chatsDB).forEach(uid => {
