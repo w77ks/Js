@@ -5,98 +5,176 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>X'ы в Ракетке</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,Helvetica,sans-serif; }
-    body { background:#111; color:#fff; min-height:100vh; display:flex; flex-direction:column; }
-    .container { flex:1; padding:15px; overflow-y:auto; }
-    h1 { text-align:center; margin-bottom:20px; font-size:1.5em; }
-    .tab-bar { display:flex; justify-content:space-around; background:#222; padding:10px 0; position:fixed; bottom:0; left:0; right:0; border-top:1px solid #333; }
-    .tab-btn { background:none; border:none; color:#aaa; font-size:0.9em; padding:8px; flex:1; text-align:center; cursor:pointer; }
-    .tab-btn.active { color:#0f0; }
+    :root {
+      --bg: #0f0a1a;
+      --card: #1a1230;
+      --purple: #b14eff;
+      --purple-glow: #d18aff;
+      --green: #00ff9d;
+      --yellow: #ffd700;
+      --red: #ff3b5f;
+      --text: #e0d4ff;
+      --text-dim: #a085d4;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--text); font-family:'Segoe UI',sans-serif; min-height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+    .container { flex:1; padding:20px; overflow-y:auto; padding-bottom:80px; }
+    h1 { text-align:center; font-size:1.8em; margin-bottom:25px; background:linear-gradient(90deg, #b14eff, #8a2be2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:700; letter-spacing:1px; animation:pulse 2s infinite; }
+
+    /* Анимации */
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.8; } }
+    @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+    @keyframes glow { 0%,100% { box-shadow:0 0 15px rgba(177,78,255,0.4); } 50% { box-shadow:0 0 30px rgba(177,78,255,0.8); } }
+    @keyframes gradient { 0% { background-position:0% 50%; } 100% { background-position:100% 50%; } }
+
+    /* Карточки */
+    .card { background:var(--card); border-radius:16px; padding:18px; margin:15px 0; border:1px solid rgba(177,78,255,0.2); position:relative; overflow:hidden; }
+    .card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg, transparent, var(--purple), transparent); animation:gradient 3s linear infinite; background-size:200%; }
+    .card.glow { animation:glow 2s infinite; }
+
+    /* Режимы */
+    .mode-grid { display:grid; gap:14px; }
+    .mode-btn { 
+      background:linear-gradient(135deg, rgba(26,18,48,0.8), rgba(15,10,26,0.9)); 
+      border-radius:14px; padding:16px; text-align:center; cursor:pointer; 
+      border:2px solid transparent; transition:all 0.3s ease; position:relative; overflow:hidden;
+    }
+    .mode-btn::after { content:''; position:absolute; inset:0; background:radial-gradient(circle at 50% 50%, rgba(177,78,255,0.2), transparent 70%); opacity:0; transition:opacity 0.3s; }
+    .mode-btn:hover::after { opacity:1; }
+    .mode-btn.active { transform:scale(1.03); }
+    .mode-btn.easy { border-color:var(--green); }
+    .mode-btn.medium { border-color:var(--yellow); }
+    .mode-btn.hard { border-color:var(--red); }
+    .mode-btn.impossible { border-color:var(--purple-glow); }
+    .mode-icon { font-size:1.6em; margin-bottom:8px; }
+    .mode-title { font-weight:600; font-size:1.1em; }
+    .mode-desc { font-size:0.85em; color:var(--text-dim); margin-top:6px; }
+
+    /* Результат */
+    #prediction-result { 
+      text-align:center; font-size:2.2em; font-weight:900; margin:30px 0; 
+      background:linear-gradient(45deg, #b14eff, #ff6bfc); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      animation:float 3s ease-in-out infinite;
+    }
+
+    .start-btn { 
+      background:linear-gradient(135deg, var(--purple), #8a2be2); color:#fff; border:none; padding:16px; 
+      border-radius:16px; font-weight:700; font-size:1.1em; cursor:pointer; text-transform:uppercase; 
+      letter-spacing:1px; box-shadow:0 8px 20px rgba(177,78,255,0.4); transition:all 0.3s; 
+      animation:pulse 1.5s infinite; margin:20px 0;
+    }
+    .start-btn:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(177,78,255,0.6); }
+
+    /* Профиль */
+    .avatar-wrapper { position:relative; width:90px; height:90px; margin:0 auto 20px; }
+    .avatar { width:100%; height:100%; border-radius:50%; background:#2a1b45; display:flex; align-items:center; justify-content:center; font-size:2.5em; color:#fff; font-weight:bold; }
+    .avatar-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.5); border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .avatar-overlay i { font-size:2em; color:#aaa; }
+    .profile-grid { display:grid; grid-template-columns:auto 1fr; gap:12px; font-size:0.95em; }
+    .profile-label { color:var(--text-dim); }
+    .profile-value { color:var(--text); font-weight:500; }
+
+    /* Подписка */
+    .sub-tabs { display:flex; gap:12px; margin-bottom:20px; }
+    .sub-tab-btn { flex:1; padding:12px; background:var(--card); border:none; color:var(--text-dim); border-radius:12px; cursor:pointer; font-weight:600; transition:all 0.3s; }
+    .sub-tab-btn.active { background:linear-gradient(135deg, var(--purple), #8a2be2); color:#fff; transform:scale(1.05); }
+
+    /* Ключи */
+    .input-group { position:relative; margin:15px 0; }
+    .input-group input { width:100%; padding:14px 16px; background:var(--card); border:1px solid rgba(177,78,255,0.3); border-radius:12px; color:var(--text); font-size:1em; }
+    .input-group input::placeholder { color:#6b5b8c; }
+    .btn { background:linear-gradient(135deg, var(--green), #00cc7a); color:#000; border:none; padding:14px; border-radius:12px; font-weight:700; cursor:pointer; transition:all 0.3s; margin-top:10px; }
+    .btn:hover { transform:translateY(-2px); }
+
+    /* Тарифы */
+    .tariff { background:var(--card); border-radius:14px; padding:18px; margin:15px 0; border-left:5px solid; position:relative; overflow:hidden; }
+    .tariff.green { border-color:var(--green); }
+    .tariff.yellow { border-color:var(--yellow); }
+    .tariff.red { border-color:var(--red); }
+    .tariff.purple { border-color:var(--purple-glow); }
+    .tariff h3 { font-size:1.2em; margin-bottom:8px; }
+    .tariff p { font-size:0.9em; color:var(--text-dim); line-height:1.5; }
+    .accuracy { font-weight:700; color:var(--text); margin:10px 0; }
+    .duration-grid { display:grid; gap:10px; margin-top:15px; }
+    .duration { background:rgba(26,18,48,0.6); border-radius:10px; padding:12px; text-align:center; font-size:0.9em; }
+    .duration-btn { display:inline-block; background:linear-gradient(135deg, var(--purple), #8a2be2); color:#fff; padding:6px 14px; border-radius:8px; margin-top:8px; font-size:0.85em; cursor:pointer; transition:all 0.3s; }
+    .duration-btn:hover { transform:scale(1.1); }
+
+    /* Админка */
+    .admin-panel { background:var(--card); border-radius:14px; padding:20px; margin-top:20px; border:2px dashed var(--purple); }
+    .admin-panel h3 { color:var(--purple-glow); margin-bottom:15px; text-align:center; }
+    .admin-panel select, .admin-panel input, .admin-panel button { margin:10px 0; width:100%; padding:12px; border-radius:10px; border:none; }
+    .admin-panel select { background:var(--bg); color:var(--text); }
+    .admin-panel button { background:linear-gradient(135deg, var(--purple), #8a2be2); color:#fff; font-weight:700; cursor:pointer; }
+
+    /* Ошибки */
+    .error { color:#ff6b6b; text-align:center; margin:15px 0; font-size:0.9em; animation:pulse 1s infinite; }
+
+    /* Нижняя панель */
+    .tab-bar { display:flex; justify-content:space-around; background:linear-gradient(180deg, rgba(15,10,26,0.9), rgba(10,5,20,0.95)); padding:12px 0; position:fixed; bottom:0; left:0; right:0; border-top:1px solid rgba(177,78,255,0.2); backdrop-filter:blur(10px); }
+    .tab-btn { background:none; border:none; color:var(--text-dim); font-size:0.9em; padding:10px; flex:1; text-align:center; cursor:pointer; transition:all 0.3s; position:relative; }
+    .tab-btn i { font-size:1.4em; display:block; margin-bottom:4px; }
+    .tab-btn.active { color:var(--purple-glow); }
+    .tab-btn.active::after { content:''; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); width:30px; height:3px; background:var(--purple-glow); border-radius:2px; animation:pulse 1.5s infinite; }
+
+    /* Скрытые вкладки */
     .tab { display:none; }
-    .tab.active { display:block; }
-    .mode-btn { background:#333; border-radius:8px; padding:12px; margin:10px 0; text-align:center; cursor:pointer; }
-    .mode-btn.easy { border:2px solid #0f0; }
-    .mode-btn.medium { border:2px solid #ff0; }
-    .mode-btn.hard { border:2px solid #f00; }
-    .mode-btn.impossible { border:2px solid #90f; }
-    .mode-desc { font-size:0.85em; color:#ccc; margin-top:5px; }
-    .profile-grid { display:grid; grid-template-columns:auto 1fr; gap:8px; font-size:0.9em; }
-    .profile-label { color:#aaa; }
-    .avatar { width:80px; height:80px; border-radius:50%; margin:0 auto 15px; background:#444; display:flex; align-items:center; justify-content:center; font-size:2em; }
-    .sub-tabs { display:flex; gap:10px; margin-bottom:15px; }
-    .sub-tab-btn { flex:1; padding:10px; background:#222; border:none; color:#fff; border-radius:6px; cursor:pointer; }
-    .sub-tab-btn.active { background:#0f0; color:#000; }
-    .sub-content { display:none; }
-    .sub-content.active { display:block; }
-    .key-input { width:100%; padding:10px; background:#222; border:1px solid #444; color:#fff; border-radius:6px; margin:10px 0; }
-    .btn { background:#0f0; color:#000; border:none; padding:10px; border-radius:6px; width:100%; cursor:pointer; font-weight:bold; }
-    .tariff { background:#222; border-radius:8px; padding:12px; margin:10px 0; }
-    .tariff.green { border-left:5px solid #0f0; }
-    .tariff.yellow { border-left:5px solid #ff0; }
-    .tariff.red { border-left:5px solid #f00; }
-    .tariff.purple { border-left:5px solid #90f; }
-    .duration { background:#333; border-radius:6px; padding:10px; margin:8px 0; font-size:0.9em; }
-    .duration-btn { background:#0a0; color:#fff; padding:6px 12px; border-radius:4px; margin-top:6px; display:inline-block; cursor:pointer; }
-    .error { color:#f66; text-align:center; margin:15px 0; }
-    .admin-panel { background:#333; padding:15px; border-radius:8px; margin-top:20px; display:none; }
-    .admin-panel input, .admin-panel select, .admin-panel button { margin:5px 0; width:100%; padding:8px; }
-    #prediction-result { text-align:center; font-size:1.4em; margin:20px 0; }
-    .start-btn { background:#0f0; color:#000; padding:12px; border-radius:8px; text-align:center; cursor:pointer; font-weight:bold; }
+    .tab.active { display:block; animation:float 0.5s ease; }
+
+    /* Плавающие частицы */
+    .particle { position:absolute; width:4px; height:4px; background:var(--purple-glow); border-radius:50%; pointer-events:none; animation:particle 4s linear infinite; opacity:0; }
+    @keyframes particle { 0% { transform:translateY(0) translateX(0); opacity:0; } 10% { opacity:1; } 90% { opacity:1; } 100% { transform:translateY(-100vh) translateX(100px); opacity:0; } }
   </style>
 </head>
 <body>
   <div class="container" id="app">
-    <h1>🚀 X'ы в Ракетке</h1>
+    <h1>X'ы в Ракетке</h1>
 
     <!-- Вкладка Коэффициенты -->
     <div class="tab active" id="tab-coeff">
-      <div class="mode-btn easy" onclick="selectMode('easy')">
-        <div>Лёгкий режим</div>
-        <div class="mode-desc">Маленькие, но точные иксы</div>
-      </div>
-      <div class="mode-btn medium" onclick="selectMode('medium')">
-        <div>Средний режим</div>
-        <div class="mode-desc">Средние иксы, более высокий риск (рекомендуется)</div>
-      </div>
-      <div class="mode-btn hard" onclick="selectMode('hard')">
-        <div>Хард режим</div>
-        <div class="mode-desc">Высокие иксы, большой риск</div>
-      </div>
-      <div class="mode-btn impossible" onclick="selectMode('impossible')">
-        <div>Невозможный режим</div>
-        <div class="mode-desc">Огромные иксы, гигантский риск (не рекомендуется)</div>
+      <div class="mode-grid">
+        <div class="mode-btn easy" onclick="selectMode('easy')">
+          <div class="mode-icon"><i class="fas fa-feather"></i></div>
+          <div class="mode-title">Лёгкий режим</div>
+          <div class="mode-desc">Маленькие, но точные иксы</div>
+        </div>
+        <div class="mode-btn medium" onclick="selectMode('medium')">
+          <div class="mode-icon"><i class="fas fa-balance-scale"></i></div>
+          <div class="mode-title">Средний режим</div>
+          <div class="mode-desc">Средние иксы, более высокий риск (рекомендуется)</div>
+        </div>
+        <div class="mode-btn hard" onclick="selectMode('hard')">
+          <div class="mode-icon"><i class="fas fa-fire"></i></div>
+          <div class="mode-title">Хард режим</div>
+          <div class="mode-desc">Высокие иксы, большой риск</div>
+        </div>
+        <div class="mode-btn impossible" onclick="selectMode('impossible')">
+          <div class="mode-icon"><i class="fas fa-infinity"></i></div>
+          <div class="mode-title">Невозможный режим</div>
+          <div class="mode-desc">Огромные иксы, гигантский риск</div>
+        </div>
       </div>
       <div id="prediction-result"></div>
-      <div class="start-btn" onclick="startPrediction()">Начать предсказание</div>
+      <button class="start-btn" onclick="startPrediction()">Начать предсказание</button>
       <div id="coeff-error" class="error"></div>
     </div>
 
     <!-- Вкладка Профиль -->
     <div class="tab" id="tab-profile">
-      <div class="avatar" id="user-avatar">?</div>
-      <div class="profile-grid">
-        <div class="profile-label">ID:</div><div id="user-id">-</div>
-        <div class="profile-label">Username:</div><div id="user-username">-</div>
-        <div class="profile-label">Display Name:</div><div id="user-display">-</div>
-        <div class="profile-label">Статус подписки:</div><div id="user-substatus">Неактивна</div>
-      </div>
-      <div id="admin-panel" class="admin-panel">
-        <h3>Админка (создание ключей)</h3>
-        <select id="admin-tariff">
-          <option value="green">Зелёный</option>
-          <option value="yellow">Жёлтый</option>
-          <option value="red">Красный</option>
-          <option value="purple">Фиолетовый</option>
-        </select>
-        <select id="admin-duration">
-          <option value="3d">3 дня</option>
-          <option value="10d">10 дней</option>
-          <option value="1m">1 месяц</option>
-          <option value="forever">Навсегда</option>
-        </select>
-        <button onclick="generateKey()">Создать ключ</button>
-        <input type="text" id="generated-key" placeholder="Сгенерированный ключ" readonly />
+      <div class="card">
+        <div class="avatar-wrapper">
+          <div class="avatar" id="user-avatar">?</div>
+          <div class="avatar-overlay" id="avatar-overlay"><i class="fas fa-question"></i></div>
+        </div>
+        <div class="profile-grid">
+          <div class="profile-label">ID:</div><div class="profile-value" id="user-id">-</div>
+          <div class="profile-label">Username:</div><div class="profile-value" id="user-username">-</div>
+          <div class="profile-label">Display Name:</div><div class="profile-value" id="user-display">-</div>
+          <div class="profile-label">Статус подписки:</div><div class="profile-value" id="user-substatus">Неактивна</div>
+        </div>
       </div>
     </div>
 
@@ -104,73 +182,117 @@
     <div class="tab" id="tab-sub">
       <div class="sub-tabs">
         <button class="sub-tab-btn active" onclick="openSubTab('activate')">Активировать ключ</button>
-        <button class="sub-tab-btn" onclick="openSubTab('buy')">Покупка подписки</button>
+        <button class="sub-tab-btn" onclick="openSubTab('buy')">Покупка</button>
         <button class="sub-tab-btn" onclick="openSubTab('rates')">Тарифы</button>
       </div>
 
       <div class="sub-content active" id="sub-activate">
-        <input type="text" class="key-input" id="key-input" placeholder="Введите ключ" />
-        <button class="btn" onclick="activateKey()">Активировать</button>
-        <div id="activate-error" class="error"></div>
+        <div class="card">
+          <div class="input-group">
+            <input type="text" id="key-input" placeholder="Введите ключ" />
+          </div>
+          <button class="btn" onclick="activateKey()">Активировать</button>
+          <div id="activate-error" class="error"></div>
+        </div>
       </div>
 
       <div class="sub-content" id="sub-buy">
-        <p>Для покупки подписки свяжитесь с <a href="https://t.me/Xanezy" target="_blank">@Xanezy</a></p>
+        <div class="card glow">
+          <p style="text-align:center; font-size:1.1em;">Для покупки подписки свяжитесь с администратором:</p>
+          <p style="text-align:center; margin-top:15px;">
+            <a href="https://t.me/Xanezy" target="_blank" style="color:var(--purple-glow); font-weight:700; text-decoration:none;">
+              <i class="fab fa-telegram-plane"></i> @Xanezy
+            </a>
+          </p>
+        </div>
       </div>
 
       <div class="sub-content" id="sub-rates">
         <!-- Зелёный -->
-        <div class="tariff green">
+        <div class="tariff green card">
           <h3>Зелёный тариф</h3>
           <p>Доступ к среднему и Хард режимам. Более низкая точность иксов чем на высоких тарифах.</p>
-          <p><strong>Точность иксов: 70-75%</strong></p>
-          <div class="duration">3 дня — Хотите купить софт на проверку? Этот тариф точно вам подходит! Всегда можно проапгрейдиться до нового тарифа.<br><span class="duration-btn" onclick="buyTariff('green','3d')">Купить</span></div>
-          <div class="duration">10 дней — Понравился софт? Удлинните свою подписку на 10 дней!<br><span class="duration-btn" onclick="buyTariff('green','10d')">Купить</span></div>
-          <div class="duration">1 месяц — Купите подписку на 1 месяц и не волнуйтесь о повторных покупках каждые 10 дней!<br><span class="duration-btn" onclick="buyTariff('green','1m')">Купить</span></div>
-          <div class="duration">Навсегда — Уверены в точности софта? Покупайте его лайф-тайм версию!<br><span class="duration-btn" onclick="buyTariff('green','forever')">Купить</span></div>
+          <div class="accuracy">Точность иксов: 70-75%</div>
+          <div class="duration-grid">
+            <div class="duration">3 дня — Хотите купить софт на проверку?<br><span class="duration-btn" onclick="buyTariff('green','3d')">Купить</span></div>
+            <div class="duration">10 дней — Продлите подписку!<br><span class="duration-btn" onclick="buyTariff('green','10d')">Купить</span></div>
+            <div class="duration">1 месяц — Без забот!<br><span class="duration-btn" onclick="buyTariff('green','1m')">Купить</span></div>
+            <div class="duration">Навсегда — Лайф-тайм!<br><span class="duration-btn" onclick="buyTariff('green','forever')">Купить</span></div>
+          </div>
         </div>
 
         <!-- Жёлтый -->
-        <div class="tariff yellow">
+        <div class="tariff yellow card">
           <h3>Жёлтый тариф</h3>
-          <p>Доступ к Лёгкому, Среднему режимам! Средняя точность иксов, выше чем на зелёном!</p>
-          <p><strong>Точность иксов: 75-85%</strong></p>
-          <div class="duration">3 дня<br><span class="duration-btn" onclick="buyTariff('yellow','3d')">Купить</span></div>
-          <div class="duration">10 дней<br><span class="duration-btn" onclick="buyTariff('yellow','10d')">Купить</span></div>
-          <div class="duration">1 месяц<br><span class="duration-btn" onclick="buyTariff('yellow','1m')">Купить</span></div>
-          <div class="duration">Навсегда<br><span class="duration-btn" onclick="buyTariff('yellow','forever')">Купить</span></div>
+          <p>Доступ к Лёгкому, Среднему режимам! Средняя точность иксов.</p>
+          <div class="accuracy">Точность иксов: 75-85%</div>
+          <div class="duration-grid">
+            <div class="duration">3 дня<br><span class="duration-btn" onclick="buyTariff('yellow','3d')">Купить</span></div>
+            <div class="duration">10 дней<br><span class="duration-btn" onclick="buyTariff('yellow','10d')">Купить</span></div>
+            <div class="duration">1 месяц<br><span class="duration-btn" onclick="buyTariff('yellow','1m')">Купить</span></div>
+            <div class="duration">Навсегда<br><span class="duration-btn" onclick="buyTariff('yellow','forever')">Купить</span></div>
+          </div>
         </div>
 
         <!-- Красный -->
-        <div class="tariff red">
+        <div class="tariff red card">
           <h3>Красный тариф</h3>
-          <p>Доступ к Лёгкому, Среднему, Хард режимам! Почти самая высокая точность иксов!</p>
-          <p><strong>Точность иксов: 85-90%</strong></p>
-          <div class="duration">3 дня<br><span class="duration-btn" onclick="buyTariff('red','3d')">Купить</span></div>
-          <div class="duration">10 дней<br><span class="duration-btn" onclick="buyTariff('red','10d')">Купить</span></div>
-          <div class="duration">1 месяц<br><span class="duration-btn" onclick="buyTariff('red','1m')">Купить</span></div>
-          <div class="duration">Навсегда<br><span class="duration-btn" onclick="buyTariff('red','forever')">Купить</span></div>
+          <p>Доступ к Лёгкому, Среднему, Хард режимам! Высокая точность.</p>
+          <div class="accuracy">Точность иксов: 85-90%</div>
+          <div class="duration-grid">
+            <div class="duration">3 дня<br><span class="duration-btn" onclick="buyTariff('red','3d')">Купить</span></div>
+            <div class="duration">10 дней<br><span class="duration-btn" onclick="buyTariff('red','10d')">Купить</span></div>
+            <div class="duration">1 месяц<br><span class="duration-btn" onclick="buyTariff('red','1m')">Купить</span></div>
+            <div class="duration">Навсегда<br><span class="duration-btn" onclick="buyTariff('red','forever')">Купить</span></div>
+          </div>
         </div>
 
         <!-- Фиолетовый -->
-        <div class="tariff purple">
+        <div class="tariff purple card glow">
           <h3>Фиолетовый тариф</h3>
-          <p>Доступ ко всем режимам, точность иксов самая высокая из всех тарифов!</p>
-          <p><strong>Точность иксов: 90-95%</strong></p>
-          <div class="duration">3 дня<br><span class="duration-btn" onclick="buyTariff('purple','3d')">Купить</span></div>
-          <div class="duration">10 дней<br><span class="duration-btn" onclick="buyTariff('purple','10d')">Купить</span></div>
-          <div class="duration">1 месяц<br><span class="duration-btn" onclick="buyTariff('purple','1m')">Купить</span></div>
-          <div class="duration">Навсегда<br><span class="duration-btn" onclick="buyTariff('purple','forever')">Купить</span></div>
+          <p>Доступ ко всем режимам, максимальная точность иксов!</p>
+          <div class="accuracy">Точность иксов: 90-95%</div>
+          <div class="duration-grid">
+            <div class="duration">3 дня<br><span class="duration-btn" onclick="buyTariff('purple','3d')">Купить</span></div>
+            <div class="duration">10 дней<br><span class="duration-btn" onclick="buyTariff('purple','10d')">Купить</span></div>
+            <div class="duration">1 месяц<br><span class="duration-btn" onclick="buyTariff('purple','1m')">Купить</span></div>
+            <div class="duration">Навсегда<br><span class="duration-btn" onclick="buyTariff('purple','forever')">Купить</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Вкладка Админка (только для админа) -->
+    <div class="tab" id="tab-admin">
+      <div class="card glow">
+        <h2 style="text-align:center; color:var(--purple-glow); margin-bottom:20px;">Админ-панель</h2>
+        <div class="admin-panel">
+          <h3>Генерация ключей</h3>
+          <select id="admin-tariff">
+            <option value="green">Зелёный тариф</option>
+            <option value="yellow">Жёлтый тариф</option>
+            <option value="red">Красный тариф</option>
+            <option value="purple">Фиолетовый тариф</option>
+          </select>
+          <select id="admin-duration">
+            <option value="3d">3 дня</option>
+            <option value="10d">10 дней</option>
+            <option value="1m">1 месяц</option>
+            <option value="forever">Навсегда</option>
+          </select>
+          <button onclick="generateKey()">Создать ключ</button>
+          <input type="text" id="generated-key" placeholder="Сгенерированный ключ" readonly />
         </div>
       </div>
     </div>
   </div>
 
   <!-- Нижняя панель -->
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="openTab('tab-coeff')">Коэффициенты</button>
-    <button class="tab-btn" onclick="openTab('tab-profile')">Профиль</button>
-    <button class="tab-btn" onclick="openTab('tab-sub')">Подписка</button>
+  <div class="tab-bar" id="tab-bar">
+    <button class="tab-btn active" onclick="openTab('tab-coeff')"><i class="fas fa-chart-line"></i><span>Коэффициенты</span></button>
+    <button class="tab-btn" onclick="openTab('tab-profile')"><i class="fas fa-user"></i><span>Профиль</span></button>
+    <button class="tab-btn" onclick="openTab('tab-sub')"><i class="fas fa-key"></i><span>Подписка</span></button>
+    <button class="tab-btn" id="admin-tab-btn" style="display:none;" onclick="openTab('tab-admin')"><i class="fas fa-cog"></i><span>Админ</span></button>
   </div>
 
   <script>
@@ -178,45 +300,44 @@
     let user = {};
     let subscription = { active: false, tariff: null, until: null, modes: [] };
     let selectedMode = null;
-    const keysDB = []; // Здесь будет база ключей (пока пусто, админ генерирует)
+    const keysDB = [];
 
-    // Инициализация Telegram WebApp
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
 
-    // Загрузка пользователя
     function initUser() {
       user = Telegram.WebApp.initDataUnsafe.user || {};
       document.getElementById('user-id').textContent = user.id || '-';
       document.getElementById('user-username').textContent = user.username ? '@'+user.username : '-';
-      document.getElementById('user-display').textContent = user.first_name + (user.last_name?' '+user.last_name:'') || '-';
+      document.getElementById('user-display').textContent = [user.first_name, user.last_name].filter(Boolean).join(' ') || '-';
+
       const avatar = document.getElementById('user-avatar');
+      const overlay = document.getElementById('avatar-overlay');
       if (user.photo_url) {
-        avatar.style.backgroundImage = `url(${user.photo_url})`;
-        avatar.style.backgroundSize = 'cover';
+        avatar.style.background = `url(${user.photo_url}) center/cover`;
+        overlay.style.display = 'none';
       } else {
         avatar.textContent = (user.first_name?.[0] || '?').toUpperCase();
       }
+
       updateSubStatus();
       if (user.id == ADMIN_ID) {
-        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('admin-tab-btn').style.display = 'flex';
       }
     }
 
-    // Обновление статуса подписки
     function updateSubStatus() {
       const el = document.getElementById('user-substatus');
       if (!subscription.active) {
         el.textContent = 'Неактивна';
-        el.style.color = '#f66';
+        el.style.color = '#ff6b6b';
       } else {
         const daysLeft = subscription.until === 'forever' ? 'Навсегда' : Math.ceil((new Date(subscription.until) - Date.now()) / 86400000) + ' дн.';
         el.textContent = `${subscription.tariff.toUpperCase()} — ${daysLeft}`;
-        el.style.color = {green:'#0f0',yellow:'#ff0',red:'#f00',purple:'#90f'}[subscription.tariff];
+        el.style.color = {green:'#00ff9d',yellow:'#ffd700',red:'#ff3b5f',purple:'#b14eff'}[subscription.tariff];
       }
     }
 
-    // Проверка доступа к режиму
     function canAccessMode(mode) {
       if (!subscription.active) return false;
       const access = {
@@ -228,19 +349,22 @@
       return access[subscription.tariff]?.includes(mode) || false;
     }
 
-    // Выбор режима
     function selectMode(mode) {
       if (!canAccessMode(mode)) {
         document.getElementById('coeff-error').textContent = 'Нет доступа к этому режиму!';
         return;
       }
       selectedMode = mode;
-      document.querySelectorAll('.mode-btn').forEach(b=>b.style.opacity=0.6);
-      document.querySelector(`.mode-btn.${mode}`).style.opacity=1;
+      document.querySelectorAll('.mode-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.transform = '';
+      });
+      const btn = document.querySelector(`.mode-btn.${mode}`);
+      btn.classList.add('active');
+      btn.style.transform = 'scale(1.03)';
       document.getElementById('coeff-error').textContent = '';
     }
 
-    // Запуск предсказания
     function startPrediction() {
       const err = document.getElementById('coeff-error');
       err.textContent = '';
@@ -257,19 +381,27 @@
         return;
       }
 
-      // Имитация предсказания
       const ranges = { easy:[1.1,1.5], medium:[1.5,3], hard:[3,10], impossible:[10,100] };
       const [min,max] = ranges[selectedMode];
       const x = (Math.random()*(max-min)+min).toFixed(2);
-      document.getElementById('prediction-result').textContent = `🚀 x${x}`;
+      document.getElementById('prediction-result').textContent = `x${x}`;
+
+      // Частицы
+      for(let i=0; i<15; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random()*100 + '%';
+        p.style.animationDelay = Math.random()*2 + 's';
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 4000);
+      }
     }
 
-    // Активация ключа
     function activateKey() {
       const key = document.getElementById('key-input').value.trim();
       const err = document.getElementById('activate-error');
       err.textContent = '';
-      const found = keysDB.find(k=>k.key===key && !k.used);
+      const found = keysDB.find(k => k.key === key && !k.used);
       if (!found) {
         err.textContent = 'Неверный или использованный ключ!';
         return;
@@ -278,50 +410,41 @@
       subscription.active = true;
       subscription.tariff = found.tariff;
       subscription.until = found.until;
-      subscription.modes = getModesForTariff(found.tariff);
       updateSubStatus();
       err.textContent = 'Ключ активирован!';
-      err.style.color = '#0f0';
+      err.style.color = '#00ff9d';
+      document.getElementById('key-input').value = '';
     }
 
-    function getModesForTariff(t) {
-      const m = {green:['medium','hard'],yellow:['easy','medium'],red:['easy','medium','hard'],purple:['easy','medium','hard','impossible']};
-      return m[t] || [];
-    }
-
-    // Генерация ключа (админ)
     function generateKey() {
       if (user.id != ADMIN_ID) return;
       const tariff = document.getElementById('admin-tariff').value;
       const dur = document.getElementById('admin-duration').value;
       const days = { '3d':3, '10d':10, '1m':30, forever:null };
       const until = days[dur] ? new Date(Date.now() + days[dur]*86400000).toISOString() : 'forever';
-      const key = btoa(Math.random()).slice(0,12).toUpperCase();
+      const key = btoa(Math.random()).slice(0,16).replace(/[^A-Z0-9]/g,'').toUpperCase();
       keysDB.push({ key, tariff, until, used:false });
       document.getElementById('generated-key').value = key;
     }
 
-    // Покупка тарифа
     function buyTariff(tariff, duration) {
       Telegram.WebApp.openLink('https://t.me/Xanezy');
     }
 
-    // Навигация
     function openTab(tabId) {
-      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
-      document.querySelector(`.tab-btn[onclick="openTab('${tabId}')"]`).classList.add('active');
+      document.querySelector(`.tab-btn[onclick="openTab('${tabId}')"]`)?.classList.add('active');
     }
 
     function openSubTab(subId) {
-      document.querySelectorAll('.sub-content').forEach(c=>c.classList.remove('active'));
-      document.querySelectorAll('.sub-tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('sub-'+subId).classList.add('active');
       document.querySelector(`.sub-tab-btn[onclick="openSubTab('${subId}')"]`).classList.add('active');
     }
 
-    // Инициализация
     window.onload = () => {
       initUser();
     };
