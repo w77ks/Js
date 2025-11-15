@@ -209,24 +209,30 @@
       font-weight: 600;
       letter-spacing: 0.5px;
       text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 20%;
     }
     .nav-item.active {
       color: #ffffff;
     }
-    .nav-item.active::before {
-      content: "";
-      display: block;
+    .nav-icon-wrapper {
       width: 36px;
       height: 36px;
-      background: linear-gradient(135deg, #7b5aff, #00c4ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 14px;
-      margin: 0 auto 8px;
-      padding: 6px;
+    }
+    .nav-item.active .nav-icon-wrapper {
+      background: linear-gradient(135deg, #7b5aff, #00c4ff);
     }
     .nav-icon {
-      font-size: 24px;
-      margin-bottom: 4px;
-      display: block;
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
     }
   </style>
 </head>
@@ -261,7 +267,7 @@
     <!-- Рулетка -->
     <div class="game-card" onclick="alert('Рулетка в разработке')">
       <div class="game-info">
-        <img src="spin.png" class="game-icon" alt="Spin" />
+        <img src="spinner.png" class="game-icon" alt="Spinner" />
         <div class="game-name">Рулетка</div>
       </div>
       <div class="online-badge">113 ОНЛАЙН</div>
@@ -277,26 +283,36 @@
     </div>
   </div>
 
-  <!-- Нижняя навигация (без эмодзи) -->
+  <!-- Нижняя навигация с PNG-иконками -->
   <div class="bottom-nav">
     <div class="nav-item active">
-      <div class="nav-icon">◆</div>
+      <div class="nav-icon-wrapper">
+        <img class="nav-icon" src="https://p7.hiclipart.com/preview/839/346/411/dice-gambling-risk-black-white-computer-icons-dice.jpg" alt="Play" />
+      </div>
       <div>Играть</div>
     </div>
     <div class="nav-item">
-      <div class="nav-icon">□</div>
+      <div class="nav-icon-wrapper">
+        <img class="nav-icon" src="https://www.clipartmax.com/png/middle/347-3475012_inventory-png-photos-inventory-icon-free.png" alt="Inventory" />
+      </div>
       <div>Инвентарь</div>
     </div>
     <div class="nav-item">
-      <div class="nav-icon">●</div>
+      <div class="nav-icon-wrapper">
+        <img class="nav-icon" src="https://static.vecteezy.com/system/resources/thumbnails/019/879/186/small/user-icon-on-transparent-background-free-png.png" alt="Profile" />
+      </div>
       <div>Профиль</div>
     </div>
     <div class="nav-item">
-      <div class="nav-icon">≡</div>
+      <div class="nav-icon-wrapper">
+        <img class="nav-icon" src="https://png.pngtree.com/png-clipart/20230422/original/pngtree-to-do-checklist-tick-tasks-png-image_9073855.png" alt="Tasks" />
+      </div>
       <div>Задания</div>
     </div>
     <div class="nav-item">
-      <div class="nav-icon">▲</div>
+      <div class="nav-icon-wrapper">
+        <img class="nav-icon" src="https://image.similarpng.com/file/similarpng/very-thumbnail/2020/08/Crown-icon-on-transparent-PNG.png" alt="Rating" />
+      </div>
       <div>Рейтинг</div>
     </div>
   </div>
