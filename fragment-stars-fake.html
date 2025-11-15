@@ -21,18 +21,17 @@
 
     .container { padding: 20px; padding-top: 60px; padding-bottom: 100px; position: relative; z-index: 1; }
 
-    .tab { display: none; }
-    .tab.active { display: block; animation: fadeIn 0.4s; }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+    .tab { display: none; opacity: 0; transition: opacity 0.3s; }
+    .tab.active { display: block; opacity: 1; }
 
     .profile-card {
       margin: 0 16px 32px; padding: 40px 24px; text-align: center;
       background: rgba(255,255,255,0.07); backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.12); border-radius: 24px;
       box-shadow: 0 12px 40px rgba(0,0,0,0.6);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.4s ease;
     }
-    .profile-card:hover { transform: translateY(-10px) rotateX(5deg); box-shadow: 0 40px 80px rgba(0,0,0,0.7); }
+    .profile-card:hover { transform: translateY(-8px); }
 
     .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); object-fit: cover; margin-bottom: 20px; background:#111; }
     .username { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
@@ -54,7 +53,7 @@
     }
     .setting-item i { font-size: 24px; opacity: 0.8; }
 
-    .soon-text { margin: 20px 16px 40px; text-align: center; font-size: 13px; opacity: 0.5; }
+    .soon-text { margin: 30px 16px; text-align: center; font-size: 13px; opacity: 0.5; }
 
     .topic-item {
       margin: 0 16px 12px; padding: 18px 20px;
@@ -64,13 +63,43 @@
     }
     .topic-item i { font-size: 24px; opacity: 0.8; }
 
+    /* Старая рабочая FAQ структура */
+    .faq-item {
+      margin: 0 16px 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .faq-question {
+      padding: 18px 20px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .faq-question::after { content: "+"; font-size: 24px; transition: transform 0.3s; }
+    .faq-question.active::after { transform: rotate(45deg); }
+    .faq-answer {
+      padding: 0 20px;
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0.8;
+    }
+    .faq-answer.active { padding: 0 20px 20px; max-height: 300px; }
+
     .admin-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 16px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 16px 20px;
     }
     .admin-btn { padding: 16px; text-align: center; background: rgba(255,255,255,0.08); border-radius: 12px; font-size: 14px; }
 
     .modal {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+      position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
       display: none; align-items: center; justify-content: center; z-index: 1000;
     }
     .modal.active { display: flex; }
@@ -86,9 +115,12 @@
       position: fixed; bottom: 0; left: 0; right: 0; height: 84px;
       background: rgba(15,15,15,0.95); backdrop-filter: blur(20px);
       border-top: 1px solid rgba(255,255,255,0.08);
-      display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+      display: flex; z-index: 1000;
     }
-    .nav-item { text-align: center; color: rgba(255,255,255,0.5); transition: all 0.3s; flex: 1; }
+    .nav-item {
+      flex: 1; text-align: center; padding: 12px 0;
+      color: rgba(255,255,255,0.5); transition: all 0.3s;
+    }
     .nav-item.active { color: #fff; }
     .nav-item i { font-size: 26px; margin-bottom: 4px; display: block; }
     .nav-label { font-size: 11px; font-weight: 500; }
@@ -99,8 +131,8 @@
   <div class="glow-bg"></div>
 
   <div class="container">
-    <!-- Главная (только до активации ключа) -->
-    <div id="tab-home" class="tab">
+    <!-- Главная (до активации) -->
+    <div id="tab-home" class="tab active">
       <div class="profile-card">
         <img id="userAvatar" class="avatar" src="" alt="">
         <div class="username" id="userName">—</div>
@@ -109,18 +141,16 @@
       <button class="btn" onclick="openKeyModal()">Активировать ключ</button>
     </div>
 
-    <!-- Настройки (появляется после активации) -->
+    <!-- Настройки (после активации) -->
     <div id="tab-settings" class="tab">
       <div class="profile-card">
         <img id="userAvatar2" class="avatar" src="" alt="">
         <div class="username" id="userName2">—</div>
         <div class="first-visit">Первый вход: <span id="visitDate2">—</span></div>
       </div>
-
       <div class="setting-item"><i data-feather="lock"></i> Конфиденциальность</div>
       <div class="setting-item"><i data-feather="user-check"></i> Наставники</div>
       <div class="setting-item"><i data-feather="help-circle"></i> Поддержка</div>
-
       <div class="soon-text">Скоро больше функций...</div>
     </div>
 
@@ -133,14 +163,22 @@
       <div class="topic-item"><i data-feather="film"></i> Медиа <span style="margin-left:auto; opacity:0.6;">0 сообщений</span></div>
     </div>
 
-    <!-- Инфо (вернул) -->
+    <!-- Инфо с FAQ -->
     <div id="tab-info" class="tab">
-      <h2 style="text-align:center; margin:60px 20px; opacity:0.7; font-size:18px;">FAQ и информация о приложении</h2>
+      <h2 style="margin:0 16px 20px; font-size:20px;">FAQ</h2>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">Как активировать ключ?</div>
+        <div class="faq-answer">Введи 6-значный код в разделе активации</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">Что даёт подписка?</div>
+        <div class="faq-answer">Доступ к темам, настройкам и будущим функциям</div>
+      </div>
     </div>
 
     <!-- Подписка (заглушка) -->
     <div id="tab-sub" class="tab">
-      <h2 style="text-align:center; margin:40px 20px; opacity:0.7;">Скоро здесь будет магазин подписок</h2>
+      <h2 style="text-align:center; margin:60px 20px; opacity:0.7;">Магазин подписок — скоро</h2>
     </div>
 
     <!-- Админ-панель -->
@@ -152,13 +190,13 @@
         <button class="admin-btn" onclick="generateKey(10)">10 дней</button>
         <button class="admin-btn" onclick="generateKey(30)">30 дней</button>
         <button class="admin-btn" onclick="generateKey(9999)">Навсегда</button>
-        <button class="admin-btn btn-red" onclick="resetSubscription()">Отключить подписку (тест)</button>
+        <button class="admin-btn btn-red" onclick="resetSubscription()">Отключить подписку</button>
       </div>
       <div id="lastKeyDisplay" style="margin:20px 16px; padding:16px; background:rgba(0,255,0,0.1); border-radius:12px; text-align:center; font-family:monospace; font-size:18px; display:none;"></div>
     </div>
   </div>
 
-  <!-- Модальное окно ввода ключа -->
+  <!-- Модальное окно -->
   <div class="modal" id="keyModal">
     <div class="modal-content">
       <h3>Активация ключа</h3>
@@ -167,7 +205,7 @@
       <p style="margin-top:20px; opacity:0.7;">
         Нет ключа? 
         <a href="#" onclick="switchTab('tab-sub'); closeModal();" style="color:#fff; text-decoration:underline;">
-          Приобрести ключ для проходки
+          Приобрести ключ
         </a>
       </p>
     </div>
@@ -175,19 +213,19 @@
 
   <!-- Навигация -->
   <div class="bottom-nav">
-    <div class="nav-item" id="homeTab" onclick="switchTab('tab-home', this)">
+    <div class="nav-item active" id="homeNav" onclick="switchTab('tab-home', this)">
       <i data-feather="home"></i><div class="nav-label">Главная</div>
     </div>
-    <div class="nav-item" id="settingsTab" onclick="switchTab('tab-settings', this)" style="display:none;">
+    <div class="nav-item" id="settingsNav" onclick="switchTab('tab-settings', this)" style="display:none;">
       <i data-feather="settings"></i><div class="nav-label">Настройки</div>
     </div>
-    <div class="nav-item" id="themesTab" onclick="switchTab('tab-themes', this)" style="display:none;">
+    <div class="nav-item" id="themesNav" onclick="switchTab('tab-themes', this)" style="display:none;">
       <i data-feather="grid"></i><div class="nav-label">Темы</div>
     </div>
     <div class="nav-item" onclick="switchTab('tab-info', this)">
       <i data-feather="info"></i><div class="nav-label">Инфо</div>
     </div>
-    <div class="nav-item" id="adminTab" onclick="switchTab('tab-admin', this)" style="display:none;">
+    <div class="nav-item" id="adminNav" onclick="switchTab('tab-admin', this)" style="display:none;">
       <i data-feather="shield"></i><div class="nav-label">Админ</div>
     </div>
   </div>
@@ -198,20 +236,17 @@
     feather.replace();
 
     const user = Telegram.WebApp.initDataUnsafe.user || {};
-    const isAdmin = (user.id === 8223197188 || user.username === 'Xanezy');
+    const isAdmin = (user.id === 8223197188 || user.username?.toLowerCase() === 'xanezy');
 
-    if (isAdmin) document.getElementById('adminTab').style.display = 'block';
+    if (isAdmin) document.getElementById('adminNav').style.display = 'block';
 
-    // Дублируем данные профиля
+    // Заполнение профиля
     function fillProfile() {
       const name = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Пользователь';
       document.getElementById('userName').textContent = name;
       document.getElementById('userName2').textContent = name;
 
-      if (user.photo_url) {
-        document.getElementById('userAvatar').src = user.photo_url;
-        document.getElementById('userAvatar2').src = user.photo_url;
-      } else {
+      const avatarUrl = user.photo_url || (() => {
         const canvas = document.createElement('canvas');
         canvas.width = canvas.height = 100;
         const ctx = canvas.getContext('2d');
@@ -219,10 +254,10 @@
         ctx.font = 'bold 40px Inter'; ctx.fillStyle = '#fff';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText((user.first_name?.[0] || '?').toUpperCase(), 50, 50);
-        const url = canvas.toDataURL();
-        document.getElementById('userAvatar').src = url;
-        document.getElementById('userAvatar2').src = url;
-      }
+        return canvas.toDataURL();
+      })();
+      document.getElementById('userAvatar').src = avatarUrl;
+      document.getElementById('userAvatar2').src = avatarUrl;
 
       const saved = localStorage.getItem('firstVisit');
       const now = new Date();
@@ -241,25 +276,44 @@
         const { expires } = JSON.parse(sub);
         const active = expires === 'forever' || Date.now() < expires;
         if (active) {
-          document.getElementById('tab-home').style.display = 'none';
-          document.getElementById('homeTab').style.display = 'none';
-          document.getElementById('settingsTab').style.display = 'block';
-          document.getElementById('themesTab').style.display = 'block';
-          switchTab('tab-settings');
+          document.getElementById('homeNav').style.display = 'none';
+          document.getElementById('settingsNav').style.display = 'block';
+          document.getElementById('themesNav').style.display = 'block';
+          switchTab('tab-settings', document.getElementById('settingsNav'));
         }
       }
     }
     checkSubscription();
 
-    // Генерация ключа
-    let lastKey = '';
-    function generateKey(days) {
+    // Переключение вкладок
+    window.switchTab = function(id, el) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      el.classList.add('active');
+    };
+
+    // FAQ
+    window.toggleFaq = function(el) {
+      el.classList.toggle('active');
+      const answer = el.nextElementSibling;
+      answer.classList.toggle('active');
+      if (answer.classList.contains('active')) {
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+      } else {
+        answer.style.maxHeight = null;
+      }
+    };
+
+    // Остальные функции (ключи, модалка и т.д.)
+    window.openKeyModal = () => document.getElementById('keyModal').classList.add('active');
+    window.closeModal = () => document.getElementById('keyModal').classList.remove('active');
+
+    window.generateKey = function(days) {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let key = '';
       for (let i = 0; i < 6; i++) key += chars[Math.floor(Math.random() * chars.length)];
-      lastKey = key;
-
-      const expires = days >= 9999 ? 'forever' : Date.now() + days * 24*60*60*1000;
+      const expires = days >= 9999 ? 'forever' : Date.now() + days*86400000;
       const keyData = { key, expires, used: false };
       let keys = JSON.parse(localStorage.getItem('generatedKeys') || '[]');
       keys.push(keyData);
@@ -268,51 +322,28 @@
       document.getElementById('lastKeyDisplay').textContent = key;
       document.getElementById('lastKeyDisplay').style.display = 'block';
       navigator.clipboard.writeText(key);
-      Telegram.WebApp.showAlert('Ключ скопирован: ' + key);
-    }
+      Telegram.WebApp.showAlert('Ключ: ' + key);
+    };
 
-    // Сброс подписки (только админ)
+    window.activateKey = function() {
+      const input = document.getElementById('keyInput').value.toUpperCase();
+      if (input.length !== 6) return Telegram.WebApp.showAlert('Ключ — 6 символов');
+      let keys = JSON.parse(localStorage.getItem('generatedKeys') || '[]');
+      const keyObj = keys.find(k => k.key === input && !k.used);
+      if (!keyObj) return Telegram.WebApp.showAlert('Ключ недействителен');
+      keyObj.used = true;
+      localStorage.setItem('generatedKeys', JSON.stringify(keys));
+      localStorage.setItem('subscription', JSON.stringify({ expires: keyObj.expires }));
+      closeModal();
+      Telegram.WebApp.showAlert('Подписка активирована!');
+      setTimeout(() => location.reload(), 1000);
+    };
+
     window.resetSubscription = function() {
       if (!isAdmin) return;
       localStorage.removeItem('subscription');
       location.reload();
     };
-
-    // Активация ключа
-    window.activateKey = function() {
-      const input = document.getElementById('keyInput').value.toUpperCase();
-      if (input.length !== 6) return Telegram.WebApp.showAlert('Ключ должен быть 6 символов');
-
-      let keys = JSON.parse(localStorage.getItem('generatedKeys') || '[]');
-      const keyObj = keys.find(k => k.key === input && !k.used);
-      if (!keyObj) return Telegram.WebApp.showAlert('Неверный или использованный ключ');
-
-      keyObj.used = true;
-      localStorage.setItem('generatedKeys', JSON.stringify(keys));
-      localStorage.setItem('subscription', JSON.stringify({ expires: keyObj.expires }));
-
-      closeModal();
-      Telegram.WebApp.showAlert('Подписка активирована!');
-      setTimeout(() => location.reload(), 800);
-    };
-
-    window.openKeyModal = () => document.getElementById('keyModal').classList.add('active');
-    window.closeModal = () => document.getElementById('keyModal').classList.remove('active');
-
-    window.switchTab = function(id, el) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      el.classList.add('active');
-    };
-
-    // Авто-открытие настроек при наличии подписки
-    if (localStorage.getItem('subscription')) {
-      checkSubscription();
-    } else {
-      switchTab('tab-home');
-      document.getElementById('homeTab').classList.add('active');
-    }
   </script>
 </body>
 </html>
