@@ -5,14 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Casino Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Подключаем твой шрифт -->
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
+    @font-face {
+      font-family: 'Dity Infant';
+      src: url('dityinfant-Regular.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #0f0f1a;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      min-height: 100vh;
-      padding-bottom: 80px;
+      color: #ffffff;
+      font-family: 'Dity Infant', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100dvh;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
       overflow-x: hidden;
     }
 
@@ -25,133 +35,157 @@
     .user-info {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 14px;
+      margin-bottom: 14px;
     }
     .avatar {
       width: 48px;
       height: 48px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #333;
+      border: 2px solid #333344;
     }
     .username {
-      font-size: 18px;
+      font-size: 19px;
       font-weight: 600;
+      letter-spacing: 0.5px;
     }
     .level {
       background: linear-gradient(90deg, #6e44ff, #00d4ff);
       color: #fff;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      margin-left: 6px;
+      padding: 3px 9px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-left: 8px;
+      font-weight: bold;
     }
 
     .balance-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 12px;
-      margin-top: 12px;
     }
     .coins {
-      background: #1c1c2a;
-      padding: 10px 14px;
-      border-radius: 14px;
       flex: 1;
-      text-align: center;
+      background: #1c1c2a;
+      padding: 14px 16px;
+      border-radius: 16px;
+      font-size: 17px;
       font-weight: 600;
-      font-size: 16px;
+      text-align: center;
     }
     .btn-plus {
+      width: 48px;
+      height: 48px;
       background: linear-gradient(135deg, #7b5aff, #00c4ff);
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 30px;
       font-weight: bold;
     }
 
     .daily-bonus {
       margin-top: 16px;
       background: #1c1c2a;
-      padding: 12px 16px;
-      border-radius: 16px;
+      padding: 14px 18px;
+      border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-    }
-    .daily-text {
       font-size: 15px;
     }
     .daily-btn {
       background: #2d2d44;
-      padding: 8px 20px;
-      border-radius: 12px;
+      padding: 10px 24px;
+      border-radius: 14px;
       font-weight: 600;
     }
 
-    /* Заголовок */
     .title {
       text-align: center;
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 800;
-      margin: 24px 0 20px;
+      letter-spacing: 1px;
+      margin: 28px 0 24px;
     }
 
     /* Карточки игр */
+    .games-container {
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding-bottom: 100px; /* место под навбар */
+    }
     .game-card {
-      margin: 0 16px 20px;
       background: #1a1a2a;
       border-radius: 20px;
-      overflow: hidden;
+      padding: 20px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       position: relative;
-      height: 180px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      transition: transform 0.2s;
+    }
+    .game-card:active {
+      transform: scale(0.98);
     }
     .game-card.soon {
-      opacity: 0.6;
+      opacity: 0.55;
+      pointer-events: none;
     }
+
+    .game-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 2;
+    }
+    .game-icon {
+      width: 84px;
+      height: 84px;
+      object-fit: contain;
+    }
+    .game-name {
+      font-size: 28px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
     .online-badge {
       position: absolute;
       top: 12px;
-      left: 12px;
-      background: rgba(0,0,0,0.6);
-      padding: 6px 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.65);
+      padding: 6px 14px;
       border-radius: 12px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
     }
     .online-badge::before {
       content: "";
       display: inline-block;
-      width: 10px;
-      height: 10px;
+      width: 9px;
+      height: 9px;
       background: #00ff9d;
       border-radius: 50%;
-      margin-right: 6px;
+      margin-right: 7px;
     }
     .soon-badge {
       position: absolute;
       top: 12px;
-      left: 12px;
-      background: rgba(255,59,59,0.8);
-      padding: 6px 12px;
+      right: 12px;
+      background: #ff3b3b;
+      padding: 6px 14px;
       border-radius: 12px;
       font-weight: 600;
-    }
-    .game-name {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      font-size: 24px;
-      font-weight: 800;
-      text-transform: uppercase;
+      font-size: 13px;
     }
 
     /* Нижняя навигация */
@@ -161,134 +195,126 @@
       left: 0;
       right: 0;
       background: #11111a;
-      border-top: 1px solid #222;
+      border-top: 1px solid #22222e;
       display: flex;
       justify-content: space-around;
-      padding: 12px 0 20px;
+      padding: 12px 0;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      backdrop-filter: blur(10px);
     }
     .nav-item {
       text-align: center;
-      color: #888;
-      font-size: 12px;
-      font-weight: 500;
+      color: #666680;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
     .nav-item.active {
-      color: #fff;
+      color: #ffffff;
     }
     .nav-item.active::before {
       content: "";
       display: block;
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(135deg, #7b5aff, #00c4ff);
-      border-radius: 12px;
-      margin: 0 auto 6px;
+      border-radius: 14px;
+      margin: 0 auto 8px;
       padding: 6px;
     }
     .nav-icon {
       font-size: 24px;
       margin-bottom: 4px;
+      display: block;
     }
   </style>
 </head>
 <body>
 
-  <!-- Топбар -->
   <div class="topbar">
     <div class="user-info">
-      <img id="userAvatar" class="avatar" src="" alt="avatar" />
+      <img id="userAvatar" class="avatar" src="https://i.ibb.co/0jZ7Y3k/default-avatar.png" alt="avatar" />
       <div>
-        <span id="userName" class="username">Загрузка...</span>
+        <span id="userName" class="username">Loading...</span>
         <span class="level">1</span>
       </div>
     </div>
 
     <div class="balance-row">
-      <div class="coins">
-        <span id="userCoins">0</span> 🪙
-      </div>
+      <div class="coins"><span id="userCoins">0</span></div>
       <div class="btn-plus">+</div>
     </div>
 
     <div class="daily-bonus">
-      <div class="daily-text">
+      <div>
         <div>ПОПОЛНИТЬ БАЛАНС</div>
-        <div style="font-size:13px;opacity:0.7;">+10 ⭐</div>
+        <div style="font-size:13px;opacity:0.7;margin-top:2px;">+10</div>
       </div>
       <div class="daily-btn">ЗАБРАТЬ</div>
     </div>
   </div>
 
-  <!-- Заголовок -->
   <h1 class="title">ИГРЫ</h1>
 
-  <!-- Рулетка -->
-  <div class="game-card" onclick="alert('Рулетка скоро будет!')">
-    <div class="online-badge">113 ОНЛАЙН</div>
-    <div style="position:absolute;top:20px;right:-40px;transform:rotate(20deg);">
-      <img src="https://i.ibb.co/7zY7Y3k/wheel.png" width="280" style="opacity:0.9;" />
+  <div class="games-container">
+    <!-- Рулетка -->
+    <div class="game-card" onclick="alert('Рулетка в разработке')">
+      <div class="game-info">
+        <img src="spin.png" class="game-icon" alt="Spin" />
+        <div class="game-name">Рулетка</div>
+      </div>
+      <div class="online-badge">113 ОНЛАЙН</div>
     </div>
-    <div class="game-name">Рулетка</div>
+
+    <!-- Ракетка -->
+    <div class="game-card soon">
+      <div class="game-info">
+        <img src="rocket.png" class="game-icon" alt="Rocket" />
+        <div class="game-name">Ракетка</div>
+      </div>
+      <div class="soon-badge">SOON</div>
+    </div>
   </div>
 
-  <!-- Ракетка (SOON) -->
-  <div class="game-card soon">
-    <div class="soon-badge">SOON</div>
-    <div style="position:absolute;bottom:0;right:20px;">
-      <img src="https://i.ibb.co/09T4n5Q/rocket.png" width="140" />
-    </div>
-    <div class="game-name">Ракетка</div>
-  </div>
-
-  <!-- Нижняя навигация -->
+  <!-- Нижняя навигация (без эмодзи) -->
   <div class="bottom-nav">
     <div class="nav-item active">
-      <div class="nav-icon">♦</div>
-      <div>ИГРАТЬ</div>
+      <div class="nav-icon">◆</div>
+      <div>Играть</div>
     </div>
     <div class="nav-item">
-      <div class="nav-icon">🎁</div>
-      <div>ИНВЕНТАРЬ</div>
+      <div class="nav-icon">□</div>
+      <div>Инвентарь</div>
     </div>
     <div class="nav-item">
-      <div class="nav-icon">👤</div>
-      <div>ПРОФИЛЬ</div>
+      <div class="nav-icon">●</div>
+      <div>Профиль</div>
     </div>
     <div class="nav-item">
-      <div class="nav-icon">📋</div>
-      <div>ЗАДАНИЯ</div>
+      <div class="nav-icon">≡</div>
+      <div>Задания</div>
     </div>
     <div class="nav-item">
-      <div class="nav-icon">👑</div>
-      <div>РЕЙТИНГ</div>
+      <div class="nav-icon">▲</div>
+      <div>Рейтинг</div>
     </div>
   </div>
 
   <script>
-    // Telegram WebApp
     const tg = window.Telegram.WebApp;
     tg.ready();
+    tg.expand();
 
-    // Подтягиваем данные пользователя
     const user = tg.initDataUnsafe.user;
-
     if (user) {
-      document.getElementById("userName").textContent = user.username || user.first_name || "Player";
-      
-      // Аватарка (если есть фото в initDataUnsafe)
+      document.getElementById("userName").textContent = 
+        user.username || user.first_name || "Player";
+
       if (user.photo_url) {
         document.getElementById("userAvatar").src = user.photo_url;
-      } else {
-        // Заглушка, если фотки нет
-        document.getElementById("userAvatar").src = "https://i.ibb.co/0jZ7Y3k/default-avatar.png";
       }
-
-      // Можно добавить баланс из твоего бэка позже
-      document.getElementById("userCoins").textContent = "0";
     }
-
-    // Растягиваем веб-апп на весь экран
-    tg.expand();
   </script>
 </body>
 </html>
