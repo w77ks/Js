@@ -3,333 +3,334 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Casino Mini App</title>
+  <title>XANEZY CASINO</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- Подключаем твой шрифт -->
   <style>
     @font-face {
       font-family: 'Dity Infant';
       src: url('dityinfant-Regular.otf') format('opentype');
-      font-weight: normal;
-      font-style: normal;
       font-display: swap;
     }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
       background: #0f0f1a;
-      color: #ffffff;
-      font-family: 'Dity Infant', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #fff;
+      font-family: 'Dity Infant', sans-serif;
       min-height: 100dvh;
-      padding-bottom: env(safe-area-inset-bottom, 20px);
       overflow-x: hidden;
     }
-
-    /* Топбар */
     .topbar {
       padding: 16px;
       background: #161622;
-      border-bottom: 1px solid #22222e;
+      border-bottom: 1px solid #222;
     }
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-    .avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #333344;
-    }
-    .username {
-      font-size: 19px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
+    .user-info { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+    .avatar { width:48px; height:48px; border-radius:50%; border:2px solid #333; object-fit:cover; }
+    .username { font-size:19px; font-weight:700; }
     .level {
-      background: linear-gradient(90deg, #6e44ff, #00d4ff);
-      color: #fff;
-      padding: 3px 9px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-left: 8px;
-      font-weight: bold;
+      background: linear-gradient(90deg,#6e44ff,#00d4ff);
+      padding:3px 10px; border-radius:8px; font-size:13px; margin-left:8px;
     }
-
-    .balance-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .balance-row { display:flex; gap:12px; align-items:center; }
     .coins {
-      flex: 1;
-      background: #1c1c2a;
-      padding: 14px 16px;
-      border-radius: 16px;
-      font-size: 17px;
-      font-weight: 600;
-      text-align: center;
+      flex:1; background:#1c1c2a; padding:14px; border-radius:16px;
+      font-size:18px; font-weight:700; text-align:center;
     }
     .btn-plus {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, #7b5aff, #00c4ff);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 30px;
-      font-weight: bold;
+      width:48px; height:48px; background:linear-gradient(135deg,#7b5aff,#00c4ff);
+      border-radius:16px; font-size:30px; display:flex; align-items:center; justify-content:center;
     }
+    .title { text-align:center; font-size:34px; font-weight:800; margin:24px 0; }
 
-    .daily-bonus {
-      margin-top: 16px;
-      background: #1c1c2a;
-      padding: 14px 18px;
-      border-radius: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 15px;
-    }
-    .daily-btn {
-      background: #2d2d44;
-      padding: 10px 24px;
-      border-radius: 14px;
-      font-weight: 600;
-    }
-
-    .title {
-      text-align: center;
-      font-size: 32px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      margin: 28px 0 24px;
-    }
-
-    /* Карточки игр */
-    .games-container {
-      padding: 0 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      padding-bottom: 100px; /* место под навбар */
-    }
+    .games { padding:0 16px; display:flex; flex-direction:column; gap:20px; padding-bottom:100px; }
     .game-card {
-      background: #1a1a2a;
-      border-radius: 20px;
-      padding: 20px;
-      height: 140px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-      transition: transform 0.2s;
+      background:#1a1a2a; border-radius:20px; padding:20px; height:140px;
+      display:flex; align-items:center; justify-content:space-between;
+      box-shadow:0 8px 25px rgba(0,0,0,0.4); cursor:pointer;
+      transition:0.2s; position:relative; overflow:hidden;
     }
-    .game-card:active {
-      transform: scale(0.98);
-    }
-    .game-card.soon {
-      opacity: 0.55;
-      pointer-events: none;
-    }
+    .game-card:active { transform:scale(0.98); }
+    .game-card.soon { opacity:0.5; pointer-events:none; }
+    .game-info { display:flex; align-items:center; gap:20px; }
+    .game-icon { width:84px; height:84px; }
+    .game-name { font-size:30px; font-weight:800; text-transform:uppercase; }
+    .online { position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.7); padding:6px 14px; border-radius:12px; font-size:13px; }
+    .online::before { content:''; display:inline-block; width:9px; height:9px; background:#0f0; border-radius:50%; margin-right:6px; }
+    .soon-badge { position:absolute; top:12px; right:12px; background:#ff3b3b; padding:6px 14px; border-radius:12px; font-weight:700; }
 
-    .game-info {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      z-index: 2;
-    }
-    .game-icon {
-      width: 84px;
-      height: 84px;
-      object-fit: contain;
-    }
-    .game-name {
-      font-size: 28px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .online-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: rgba(0,0,0,0.65);
-      padding: 6px 14px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .online-badge::before {
-      content: "";
-      display: inline-block;
-      width: 9px;
-      height: 9px;
-      background: #00ff9d;
-      border-radius: 50%;
-      margin-right: 7px;
-    }
-    .soon-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: #ff3b3b;
-      padding: 6px 14px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 13px;
-    }
-
-    /* Нижняя навигация */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #11111a;
-      border-top: 1px solid #22222e;
-      display: flex;
-      justify-content: space-around;
-      padding: 12px 0;
-      padding-bottom: calc(12px + env(safe-area-inset-bottom));
-      backdrop-filter: blur(10px);
+    /* Навигация */
+    .nav {
+      position:fixed; bottom:0; left:0; right:0; background:#11111a;
+      border-top:1px solid #222; display:flex; padding:12px 0;
+      padding-bottom:calc(12px + env(safe-area-inset-bottom));
     }
     .nav-item {
-      text-align: center;
-      color: #666680;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      width: 20%;
+      flex:1; text-align:center; color:#666; font-size:11px; font-weight:600;
+      text-transform:uppercase; display:flex; flex-direction:column; align-items:center; gap:6px;
     }
-    .nav-item.active {
-      color: #ffffff;
+    .nav-item.active { color:#fff; }
+    .nav-icon { width:28px; height:28px; filter: brightness(0) invert(1); opacity:0.6; }
+    .nav-item.active .nav-icon { opacity:1; filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(220deg); }
+
+    /* Игры внутри */
+    .screen { display:none; padding:20px; }
+    .screen.active { display:block; }
+    .back-btn {
+      position:absolute; top:16px; left:16px; background:rgba(0,0,0,0.5);
+      padding:10px 16px; border-radius:12px; font-weight:600; z-index:10;
     }
-    .nav-icon-wrapper {
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 14px;
+
+    /* Рулетка */
+    #rouletteCanvas { width:100%; max-width:400px; margin:20px auto; display:block; border-radius:20px; }
+    .bet-buttons { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:20px 0; }
+    .bet-btn {
+      background:#2a2a3a; padding:12px 20px; border-radius:12px; font-weight:700;
+      min-width:80px; text-align:center;
     }
-    .nav-item.active .nav-icon-wrapper {
-      background: linear-gradient(135deg, #7b5aff, #00c4ff);
+    .bet-btn.active { background:#7b5aff; }
+
+    /* Crash */
+    #crashGraph { width:100%; height:300px; background:#111; border-radius:16px; position:relative; overflow:hidden; }
+    .multiplier {
+      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      font-size:64px; font-weight:800; color:#0f0; text-shadow:0 0 20px #0f0;
     }
-    .nav-icon {
-      width: 24px;
-      height: 24px;
-      object-fit: contain;
-    }
+    .crash-controls { display:flex; gap:12px; margin-top:20px; }
+    .bet-input { flex:1; padding:16px; background:#1c1c2a; border-radius:16px; text-align:center; font-size:18px; }
+    .cashout-btn { padding:16px 32px; background:#ff3b3b; border-radius:16px; font-weight:700; font-size:18px; }
+    .cashout-btn.active { background:#0f0; color:#000; }
   </style>
 </head>
 <body>
 
-  <div class="topbar">
-    <div class="user-info">
-      <img id="userAvatar" class="avatar" src="https://i.ibb.co/0jZ7Y3k/default-avatar.png" alt="avatar" />
-      <div>
-        <span id="userName" class="username">Loading...</span>
-        <span class="level">1</span>
+  <!-- Главный экран -->
+  <div id="main" class="screen active">
+    <div class="topbar">
+      <div class="user-info">
+        <img id="avatar" class="avatar" src="" />
+        <div><span id="username" class="username">Player</span><span class="level">1</span></div>
+      </div>
+      <div class="balance-row">
+        <div class="coins"><span id="balance">10000</span></div>
+        <div class="btn-plus" onclick="addCoins(1000)">+</div>
       </div>
     </div>
 
-    <div class="balance-row">
-      <div class="coins"><span id="userCoins">0</span></div>
-      <div class="btn-plus">+</div>
-    </div>
+    <h1 class="title">ИГРЫ</h1>
 
-    <div class="daily-bonus">
-      <div>
-        <div>ПОПОЛНИТЬ БАЛАНС</div>
-        <div style="font-size:13px;opacity:0.7;margin-top:2px;">+10</div>
+    <div class="games">
+      <div class="game-card" onclick="openGame('roulette')">
+        <div class="game-info">
+          <img src="spinner.png" class="game-icon" />
+          <div class="game-name">Рулетка</div>
+        </div>
+        <div class="online">113 ОНЛАЙН</div>
       </div>
-      <div class="daily-btn">ЗАБРАТЬ</div>
+
+      <div class="game-card" onclick="openGame('crash')">
+        <div class="game-info">
+          <img src="rocket.png" class="game-icon" />
+          <div class="game-name">Ракетка</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <h1 class="title">ИГРЫ</h1>
-
-  <div class="games-container">
-    <!-- Рулетка -->
-    <div class="game-card" onclick="alert('Рулетка в разработке')">
-      <div class="game-info">
-        <img src="spinner.png" class="game-icon" alt="Spinner" />
-        <div class="game-name">Рулетка</div>
-      </div>
-      <div class="online-badge">113 ОНЛАЙН</div>
+  <!-- Рулетка -->
+  <div id="roulette" class="screen">
+    <div class="back-btn" onclick="openGame('main')">НАЗАД</div>
+    <h1 class="title">РУЛЕТКА</h1>
+    <canvas id="rouletteCanvas"></canvas>
+    <div style="text-align:center; font-size:20px; margin:20px 0;" id="result"></div>
+    <div class="bet-buttons">
+      <div class="bet-btn active" data-bet="100">100</div>
+      <div class="bet-btn" data-bet="500">500</div>
+      <div class="bet-btn" data-bet="1000">1K</div>
+      <div class="bet-btn" data-bet="5000">5K</div>
     </div>
-
-    <!-- Ракетка -->
-    <div class="game-card soon">
-      <div class="game-info">
-        <img src="rocket.png" class="game-icon" alt="Rocket" />
-        <div class="game-name">Ракетка</div>
-      </div>
-      <div class="soon-badge">SOON</div>
-    </div>
+    <button onclick="spinRoulette()" style="width:100%; padding:18px; background:linear-gradient(135deg,#7b5aff,#00c4ff); border-radius:16px; font-size:20px; font-weight:800;">КРУТИТЬ</button>
   </div>
 
-  <!-- Нижняя навигация с PNG-иконками -->
-  <div class="bottom-nav">
-    <div class="nav-item active">
-      <div class="nav-icon-wrapper">
-        <img class="nav-icon" src="https://p7.hiclipart.com/preview/839/346/411/dice-gambling-risk-black-white-computer-icons-dice.jpg" alt="Play" />
-      </div>
+  <!-- Crash -->
+  <div id="crash" class="screen">
+    <div class="back-btn" onclick="openGame('main')">НАЗАД</div>
+    <h1 class="title">РАКЕТКА</h1>
+    <div id="crashGraph">
+      <div class="multiplier" id="multiplier">1.00x</div>
+    </div>
+    <div class="crash-controls">
+      <input type="number" class="bet-input" id="crashBet" value="1000" />
+      <button class="cashout-btn" id="cashoutBtn" onclick="cashout()" disabled>КЭШАУТ</button>
+    </div>
+    <button onclick="startCrash()" style="width:100%; margin-top:12px; padding:18px; background:#7b5aff; border-radius:16px; font-size:20px; font-weight:800;">СТАРТ</button>
+    <div style="margin-top:20px; font-size:14px; opacity:0.7;" id="crashHistory"></div>
+  </div>
+
+  <!-- Навигация с векторными SVG -->
+  <div class="nav">
+    <div class="nav-item active" onclick="openGame('main')">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2L2 12h3v8h14v-8h3L12 2z"/></svg>
       <div>Играть</div>
     </div>
-    <div class="nav-item">
-      <div class="nav-icon-wrapper">
-        <img class="nav-icon" src="https://www.clipartmax.com/png/middle/347-3475012_inventory-png-photos-inventory-icon-free.png" alt="Inventory" />
-      </div>
+    <div class="nav-item" onclick="alert('Инвентарь скоро')">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
       <div>Инвентарь</div>
     </div>
-    <div class="nav-item">
-      <div class="nav-icon-wrapper">
-        <img class="nav-icon" src="https://static.vecteezy.com/system/resources/thumbnails/019/879/186/small/user-icon-on-transparent-background-free-png.png" alt="Profile" />
-      </div>
+    <div class="nav-item" onclick="alert('Профиль скоро')">
+      <svg class="nav-icon" viewBox="0 0 24 24"><circle fill="currentColor" cx="12" cy="8" r="4"/><path fill="currentColor" d="M12 14c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z"/></svg>
       <div>Профиль</div>
     </div>
-    <div class="nav-item">
-      <div class="nav-icon-wrapper">
-        <img class="nav-icon" src="https://png.pngtree.com/png-clipart/20230422/original/pngtree-to-do-checklist-tick-tasks-png-image_9073855.png" alt="Tasks" />
-      </div>
+    <div class="nav-item" onclick="alert('Задания скоро')">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
       <div>Задания</div>
     </div>
-    <div class="nav-item">
-      <div class="nav-icon-wrapper">
-        <img class="nav-icon" src="https://image.similarpng.com/file/similarpng/very-thumbnail/2020/08/Crown-icon-on-transparent-PNG.png" alt="Rating" />
-      </div>
+    <div class="nav-item" onclick="alert('Рейтинг скоро')">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
       <div>Рейтинг</div>
     </div>
   </div>
 
   <script>
     const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    tg.ready(); tg.expand();
 
-    const user = tg.initDataUnsafe.user;
-    if (user) {
-      document.getElementById("userName").textContent = 
-        user.username || user.first_name || "Player";
+    const user = tg.initDataUnsafe.user || {};
+    document.getElementById('username').textContent = user.username || user.first_name || 'Player';
+    if (user.photo_url) document.getElementById('avatar').src = user.photo_url;
 
-      if (user.photo_url) {
-        document.getElementById("userAvatar").src = user.photo_url;
+    let balance = parseInt(localStorage.getItem('balance')) || 10000;
+    document.getElementById('balance').textContent = balance;
+
+    function updateBalance() {
+      document.getElementById('balance').textContent = balance;
+      localStorage.setItem('balance', balance);
+    }
+    function addCoins(n) { balance += n; updateBalance(); }
+
+    function openGame(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if(id==='main') document.querySelector('.nav-item').classList.add('active');
+    }
+
+    // === РУЛЕТКА ===
+    const canvas = document.getElementById('rouletteCanvas');
+    const ctx = canvas.getContext('2d');
+    let currentBet = 100;
+    document.querySelectorAll('.bet-btn').forEach(b => {
+      b.onclick = () => {
+        document.querySelectorAll('.bet-btn').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        currentBet = parseInt(b.dataset.bet);
       }
+    });
+
+    const numbers = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+    const colors = ['#0f0','#000','#f00','#000','#f00','#000','#f00','#000','#f00','#000','#f00','#000','#f00','#000','#f00','#000','#f00','#000','#000','#f00','#000','#f00','#000','#f00','#000','#f00','#000','#f00','#000','#f00','#000','#f00','#000','#f00','#000','#f00','#000'];
+
+    function drawWheel(angle) {
+      canvas.width = canvas.offsetWidth * devicePixelRatio;
+      canvas.height = canvas.width;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      const r = canvas.width/2;
+      const step = 360/37;
+      for(let i=0;i<37;i++){
+        ctx.beginPath();
+        ctx.fillStyle = colors[i];
+        ctx.moveTo(r,r);
+        ctx.arc(r,r,r, (i*step + angle)*Math.PI/180, ((i+1)*step + angle)*Math.PI/180);
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.save();
+        ctx.translate(r,r);
+        ctx.rotate((i*step + step/2 + angle)*Math.PI/180);
+        ctx.fillText(numbers[i], r*0.7, 10);
+        ctx.restore();
+      }
+    }
+
+    function spinRoulette() {
+      if(balance < currentBet) return alert('Недостаточно средств');
+      balance -= currentBet;
+      updateBalance();
+
+      const spins = 5 + Math.random()*5;
+      const final = Math.floor(Math.random()*37);
+      const targetAngle = spins*360 + final*(360/37);
+
+      let angle = 0;
+      const anim = setInterval(()=>{
+        angle += 25;
+        drawWheel(angle);
+        if(angle >= targetAngle){
+          clearInterval(anim);
+          drawWheel(targetAngle % 360);
+          const won = final === 0 ? currentBet*36 : 0;
+          if(won>0) balance += won*2;
+          updateBalance();
+          document.getElementById('result').textContent = `Выпало: ${final} (${won>0?'ВЫИГРЫШ!':'Проигрыш'})`;
+        }
+      }, 50);
+    }
+    drawWheel(0);
+
+    // === CRASH ===
+    let crashRunning = false;
+    let currentMult = 1.0;
+    let crashPoint = 0;
+    let hasCashed = false;
+
+    function startCrash() {
+      if(crashRunning) return;
+      const bet = parseInt(document.getElementById('crashBet').value);
+      if(balance < bet) return alert('Недостаточно средств');
+      balance -= bet; updateBalance();
+      crashRunning = true;
+      hasCashed = false;
+      document.getElementById('cashoutBtn').disabled = false;
+      document.getElementById('cashoutBtn').textContent = 'КЭШАУТ';
+      document.getElementById('cashoutBtn').classList.remove('active');
+
+      crashPoint = 1 + Math.random()*10;
+      if(Math.random()<0.05) crashPoint = 1.01; // 5% шанс на мгновенный краш
+
+      currentMult = 1.00;
+      const interval = setInterval(()=>{
+        currentMult += 0.01;
+        document.getElementById('multiplier').textContent = currentMult.toFixed(2)+'x';
+        if(currentMult >= crashPoint){
+          clearInterval(interval);
+          crashRunning = false;
+          document.getElementById('multiplier').textContent = 'КРАШ!';
+          document.getElementById('multiplier').style.color = '#f33';
+          document.getElementById('cashoutBtn').disabled = true;
+          if(!hasCashed){
+            addHistory(`Краш на ${crashPoint.toFixed(2)}x`);
+          }
+        }
+      }, 100);
+    }
+
+    function cashout() {
+      if(!crashRunning || hasCashed) return;
+      hasCashed = true;
+      const win = parseInt(document.getElementById('crashBet').value) * currentMult;
+      balance += Math.floor(win);
+      updateBalance();
+      document.getElementById('cashoutBtn').textContent = 'ВЫВЕДЕНО!';
+      document.getElementById('cashoutBtn').classList.add('active');
+      addHistory(`Кэшаут на ${currentMult.toFixed(2)}x (+${Math.floor(win-parseInt(document.getElementById('crashBet').value))})`);
+    }
+
+    function addHistory(text) {
+      const h = document.getElementById('crashHistory');
+      h.innerHTML = text + '<br>' + h.innerHTML;
     }
   </script>
 </body>
