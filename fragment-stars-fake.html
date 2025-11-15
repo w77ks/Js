@@ -4,10 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Monochrome Mini App</title>
-
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Heroicons (outline) -->
-  <script src="https://cdn.jsdelivr.net/npm/heroicons@2.1.1/24/outline/index.min.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -15,60 +12,75 @@
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: #000;
+      background: #0e0e0e;
       color: #fff;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* Liquid glass в чёрно-белом */
-    .glass {
+    /* Пульсирующий световой ореол */
+    .glow-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.06) 0%, transparent 60%);
+      animation: pulse 8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    .container { padding: 20px; padding-top: 60px; padding-bottom: 100px; }
+
+    /* Карточка профиля с 3D-эффектом при наведении */
+    .profile-card {
+      position: relative;
+      margin: 0 16px 32px;
+      padding: 40px 24px;
+      text-align: center;
       background: rgba(255,255,255,0.06);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+      transform-style: preserve-3d;
+      cursor: default;
     }
 
-    .container {
-      padding: 20px;
-      padding-top: 60px;
-      padding-bottom: 100px;
-    }
-
-    .profile-card {
-      margin: 0 16px 24px 16px;
-      padding: 32px 24px;
-      text-align: center;
+    /* Эффект "плавания" при наведении/касании */
+    .profile-card:hover,
+    .profile-card.touched {
+      transform: translateY(-8px) rotateX(4deg) rotateY(2deg);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
     }
 
     .avatar {
-      width: 96px; height: 96px;
+      width: 100px; height: 100px;
       border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.2);
+      border: 3px solid rgba(255,255,255,0.25);
       object-fit: cover;
       margin-bottom: 20px;
       background: #111;
     }
 
     .username {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 600;
       margin-bottom: 8px;
-      letter-spacing: -0.5px;
     }
 
     .first-visit {
       font-size: 13px;
-      opacity: 0.6;
-      margin-bottom: 32px;
+      opacity: 0.7;
     }
 
     .buy-btn {
       width: calc(100% - 32px);
       margin: 0 16px;
-      padding: 16px;
+      padding: 18px;
       background: #fff;
       color: #000;
       font-size: 17px;
@@ -79,19 +91,15 @@
       transition: all 0.25s ease;
     }
 
-    .buy-btn:active {
-      transform: translateY(2px);
-      background: #eee;
-    }
+    .buy-btn:active { transform: translateY(2px); background: #f0f0f0; }
 
     /* Нижняя навигация */
     .bottom-nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
       height: 84px;
-      background: rgba(0,0,0,0.4);
+      background: rgba(20,20,20,0.8);
       backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(255,255,255,0.08);
       display: flex;
       justify-content: space-around;
@@ -100,33 +108,25 @@
     }
 
     .nav-item {
-      text-align: center;
       color: rgba(255,255,255,0.5);
       transition: all 0.3s;
     }
-
-    .nav-item.active {
-      color: #fff;
-    }
-
-    .nav-item.active svg { stroke: #fff; fill: none; }
+    .nav-item.active { color: #fff; }
     .nav-item svg {
       width: 28px; height: 28px;
       stroke: currentColor;
       stroke-width: 1.8;
       margin-bottom: 4px;
     }
-
-    .nav-label {
-      font-size: 11px;
-      font-weight: 500;
-    }
+    .nav-label { font-size: 11px; font-weight: 500; }
   </style>
 </head>
 <body>
 
+  <div class="glow-bg"></div>
+
   <div class="container">
-    <div class="glass profile-card">
+    <div class="profile-card" id="profileCard">
       <img id="userAvatar" class="avatar" src="" alt="">
       <div class="username" id="userName">—</div>
       <div class="first-visit">Первый вход: <span id="visitDate">—</span></div>
@@ -135,18 +135,18 @@
     <button class="buy-btn" onclick="buyAccess()">Купить доступ</button>
   </div>
 
-  <!-- Нижняя навигация (только иконки, без эмодзи) -->
+  <!-- Нижняя навигация с настоящими SVG-иконками -->
   <div class="bottom-nav">
     <div class="nav-item active">
-      <svg><use href="#home"></use></svg>
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <div class="nav-label">Главная</div>
     </div>
     <div class="nav-item">
-      <svg><use href="#cog-6-tooth"></use></svg>
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 ="1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       <div class="nav-label">Настройки</div>
     </div>
     <div class="nav-item">
-      <svg><use href="#information-circle"></use></svg>
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3m.08 4h.01"/></svg>
       <div class="nav-label">Инфо</div>
     </div>
   </div>
@@ -156,6 +156,11 @@
     Telegram.WebApp.expand();
 
     const user = Telegram.WebApp.initDataUnsafe.user || {};
+    const card = document.getElementById('profileCard');
+
+    // Поддержка касания на мобильных
+    card.addEventListener('touchstart', () => card.classList.add('touched'));
+    card.addEventListener('touchend', () => setTimeout(() => card.classList.remove('touched'), 300));
 
     // Имя
     document.getElementById('userName').textContent =
@@ -166,34 +171,33 @@
       document.getElementById('userAvatar').src = user.photo_url;
     } else {
       const canvas = document.createElement('canvas');
-      canvas.width = canvas.height = 96;
+      canvas.width = canvas.height = 100;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#222';
-      ctx.fillRect(0,0,96,96);
-      ctx.font = 'bold 36px Inter';
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(0,0,100,100);
+      ctx.font = 'bold 40px Inter';
       ctx.fillStyle = '#fff';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText((user.first_name?.[0] || '?').toUpperCase(), 48, 48);
+      ctx.fillText((user.first_name?.[0] || '?').toUpperCase(), 50, 50);
       document.getElementById('userAvatar').src = canvas.toDataURL();
     }
 
     // Дата первого входа
     const saved = localStorage.getItem('firstVisit');
     const now = new Date();
-    const dateStr = now.getFullYear() + '.' + 
-      String(now.getMonth()+1).padStart(2,'0') + '.' + 
-      String(now.getDate()).padStart(2,'0') + ', ' + 
+    const dateStr = now.getFullYear() + '.' +
+      String(now.getMonth()+1).padStart(2,'0') + '.' +
+      String(now.getDate()).padStart(2,'0') + ', ' +
       now.toTimeString().slice(0,8);
 
-    const displayDate = saved || dateStr;
     if (!saved) localStorage.setItem('firstVisit', dateStr);
-    document.getElementById('visitDate').textContent = displayDate;
+    document.getElementById('visitDate').textContent = saved || dateStr;
 
     function buyAccess() {
       Telegram.WebApp.showPopup({
         title: "Покупка доступа",
-        message: "В ближайшее время будет доступна оплата",
+        message: "Оплата будет доступна в ближайшее время",
         buttons: [{type: "ok"}]
       });
     }
