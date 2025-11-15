@@ -3,504 +3,292 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GiftUp Soft</title>
+  <title>Casino Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    @font-face {
-      font-family: 'DityInfant';
-      src: url('dityinfant-Regular.otf') format('opentype');
-      font-weight: normal;
-      font-style: normal;
-    }
-
-    :root {
-      --bg: #0a0a1a;
-      --card: #1a1230;
-      --purple: #b14eff;
-      --purple-glow: #d18aff;
-      --green: #00ff9d;
-      --yellow: #ffd700;
-      --red: #ff3b5f;
-      --text: #e0d4ff;
-      --text-dim: #a085d4;
-      --border: rgba(177,78,255,0.2);
-    }
-
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:var(--bg); color:var(--text); font-family:'DityInfant', 'Segoe UI',sans-serif; min-height:100vh; display:flex; flex-direction:column; overflow:hidden; }
-    .container { flex:1; padding:20px; overflow-y:scroll; padding-bottom:120px; -webkit-overflow-scrolling:touch; scroll-behavior:smooth; }
-    h1 { text-align:center; font-size:1.9em; margin-bottom:25px; background:linear-gradient(90deg, #b14eff, #8a2be2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:700; letter-spacing:1px; animation:pulse 2s infinite; }
-
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.85; } }
-    @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
-    @keyframes glow { 0%,100% { box-shadow:0 0 15px rgba(177,78,255,0.4); } 50% { box-shadow:0 0 30px rgba(177,78,255,0.8); } }
-    @keyframes gradient { 0% { background-position:0% 50%; } 100% { background-position:100% 50%; } }
-
-    .card { background:var(--card); border-radius:16px; padding:18px; margin:15px 0; border:1px solid var(--border); position:relative; overflow:hidden; }
-    .card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg, transparent, var(--purple), transparent); animation:gradient 3s linear infinite; background-size:200%; }
-    .card.glow { animation:glow 2s infinite; }
-
-    .mode-grid { display:grid; gap:14px; }
-    .mode-btn { 
-      background:linear-gradient(135deg, rgba(26,18,48,0.8), rgba(15,10,26,0.9)); 
-      border-radius:14px; padding:16px; text-align:center; cursor:pointer; 
-      border:2px solid transparent; transition:all 0.3s ease; position:relative; overflow:hidden;
+    body {
+      background: #0f0f1a;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 80px;
+      overflow-x: hidden;
     }
-    .mode-btn::after { content:''; position:absolute; inset:0; background:radial-gradient(circle at 50% 50%, rgba(177,78,255,0.2), transparent 70%); opacity:0; transition:opacity 0.3s; }
-    .mode-btn:hover::after { opacity:1; }
-    .mode-btn.active { transform:scale(1.03); }
-    .mode-btn.easy { border-color:var(--green); }
-    .mode-btn.medium { border-color:var(--yellow); }
-    .mode-btn.hard { border-color:var(--red); }
-    .mode-btn.impossible { border-color:var(--purple-glow); }
-    .mode-icon { font-size:1.6em; margin-bottom:8px; }
-    .mode-title { font-weight:600; font-size:1.1em; }
-    .mode-desc { font-size:0.85em; color:var(--text-dim); margin-top:6px; }
 
-    #prediction-result { text-align:center; font-size:2.2em; font-weight:900; margin:30px 0; background:linear-gradient(45deg, #b14eff, #ff6bfc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:float 3s ease-in-out infinite; }
+    /* Топбар */
+    .topbar {
+      padding: 16px;
+      background: #161622;
+      border-bottom: 1px solid #22222e;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #333;
+    }
+    .username {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .level {
+      background: linear-gradient(90deg, #6e44ff, #00d4ff);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-left: 6px;
+    }
 
-    .start-btn { background:linear-gradient(135deg, var(--purple), #8a2be2); color:#fff; border:none; padding:16px; border-radius:16px; font-weight:700; font-size:1.1em; cursor:pointer; text-transform:uppercase; letter-spacing:1px; box-shadow:0 8px 20px rgba(177,78,255,0.4); transition:all 0.3s; animation:pulse 1.5s infinite; margin:20px 0; }
-    .start-btn:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(177,78,255,0.6); }
+    .balance-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .coins {
+      background: #1c1c2a;
+      padding: 10px 14px;
+      border-radius: 14px;
+      flex: 1;
+      text-align: center;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .btn-plus {
+      background: linear-gradient(135deg, #7b5aff, #00c4ff);
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: bold;
+    }
 
-    .avatar { width:90px; height:90px; border-radius:50%; background:#2a1b45; display:flex; align-items:center; justify-content:center; font-size:2.5em; color:#fff; font-weight:bold; margin:0 auto 20px; }
-    .profile-grid { display:grid; grid-template-columns:auto 1fr; gap:12px; font-size:0.95em; }
-    .profile-label { color:var(--text-dim); }
-    .profile-value { color:var(--text); font-weight:500; }
+    .daily-bonus {
+      margin-top: 16px;
+      background: #1c1c2a;
+      padding: 12px 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .daily-text {
+      font-size: 15px;
+    }
+    .daily-btn {
+      background: #2d2d44;
+      padding: 8px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
 
-    .sub-tabs { display:flex; gap:12px; margin-bottom:20px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:5px; }
-    .sub-tab-btn { flex:1; min-width:100px; padding:12px; background:var(--card); border:none; color:var(--text-dim); border-radius:12px; cursor:pointer; font-weight:600; transition:all 0.3s; white-space:nowrap; }
-    .sub-tab-btn.active { background:linear-gradient(135deg, var(--purple), #8a2be2); color:#fff; transform:scale(1.05); }
+    /* Заголовок */
+    .title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 800;
+      margin: 24px 0 20px;
+    }
 
-    .input-group { position:relative; margin:15px 0; }
-    .input-group input { width:100%; padding:14px 16px; background:var(--card); border:1px solid rgba(177,78,255,0.3); border-radius:12px; color:var(--text); font-size:1em; }
-    .input-group input::placeholder { color:#6b5b8c; }
-    .btn { background:linear-gradient(135deg, var(--green), #00cc7a); color:#000; border:none; padding:14px; border-radius:12px; font-weight:700; cursor:pointer; transition:all 0.3s; margin-top:10px; }
-    .btn:hover { transform:translateY(-2px); }
+    /* Карточки игр */
+    .game-card {
+      margin: 0 16px 20px;
+      background: #1a1a2a;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      height: 180px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .game-card.soon {
+      opacity: 0.6;
+    }
+    .online-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0,0,0,0.6);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .online-badge::before {
+      content: "";
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #00ff9d;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .soon-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(255,59,59,0.8);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    .game-name {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      font-size: 24px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
 
-    .support-btn { background:linear-gradient(135deg, #ff6b6b, #ff3b5f); color:#fff; padding:16px; border-radius:16px; font-weight:700; text-align:center; cursor:pointer; margin:20px 0; }
-    .support-btn:hover { transform:scale(1.02); }
-
-    .tariff { background:var(--card); border-radius:14px; padding:18px; margin:15px 0; border-left:5px solid; position:relative; overflow:hidden; }
-    .tariff.green { border-color:var(--green); }
-    .tariff.yellow { border-color:var(--yellow); }
-    .tariff.red { border-color:var(--red); }
-    .tariff.purple { border-color:var(--purple-glow); }
-    .tariff h3 { font-size:1.2em; margin-bottom:8px; }
-    .tariff p { font-size:0.9em; color:var(--text-dim); line-height:1.5; }
-    .accuracy { font-weight:700; color:var(--text); margin:10px 0; }
-    .duration-grid { display:grid; gap:10px; margin-top:15px; }
-    .duration { background:rgba(26,18,48,0.6); border-radius:10px; padding:12px; text-align:center; font-size:0.9em; }
-    .duration-btn { display:inline-block; background:linear-gradient(135deg, var(--purple), #8a2be2); color:#fff; padding:6px 14px; border-radius:8px; margin-top:8px; font-size:0.85em; cursor:pointer; transition:all 0.3s; }
-    .duration-btn:hover { transform:scale(1.1); }
-
-    .admin-panel { background:var(--card); border-radius:14px; padding:20px; margin-top:20px; border:2px dashed var(--purple); }
-    .admin-panel h3 { color:var(--purple-glow); margin-bottom:15px; text-align:center; }
-    .admin-panel select, .admin-panel input, .admin-panel button { margin:10px 0; width:100%; padding:12px; border-radius:10px; border:none; }
-    .admin-panel select { background:var(--bg); color:var(--text); }
-    .admin-panel button { background:linear-gradient(135deg, var(--purple), #8a2be2); color:#fff; font-weight:700; cursor:pointer; }
-
-    .chat-item { background:var(--card); border-radius:12px; padding:14px; margin:12px 0; border-left:4px solid var(--purple); }
-    .chat-user { font-weight:600; color:var(--purple-glow); margin-bottom:6px; }
-    .chat-msg { font-size:0.95em; color:var(--text); }
-    .chat-actions { margin-top:10px; display:flex; gap:8px; }
-    .chat-actions button { flex:1; padding:8px; font-size:0.85em; border-radius:8px; }
-
-    .error { color:#ff6b6b; text-align:center; margin:15px 0; font-size:0.9em; animation:pulse 1s infinite; }
-
-    .tab-bar { display:flex; justify-content:space-around; background:linear-gradient(180deg, rgba(15,10,26,0.9), rgba(10,5,20,0.95)); padding:12px 0; position:fixed; bottom:0; left:0; right:0; border-top:1px solid var(--border); backdrop-filter:blur(10px); z-index:1000; }
-    .tab-btn { background:none; border:none; color:var(--text-dim); font-size:0.9em; padding:10px; flex:1; text-align:center; cursor:pointer; transition:all 0.3s; position:relative; }
-    .tab-btn i { font-size:1.4em; display:block; margin-bottom:4px; }
-    .tab-btn.active { color:var(--purple-glow); }
-    .tab-btn.active::after { content:''; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); width:30px; height:3px; background:var(--purple-glow); border-radius:2px; animation:pulse 1.5s infinite; }
-
-    .tab { display:none; }
-    .tab.active { display:block; }
-
-    .particle { position:absolute; width:4px; height:4px; background:var(--purple-glow); border-radius:50%; pointer-events:none; animation:particle 4s linear infinite; opacity:0; }
-    @keyframes particle { 0% { transform:translateY(0) translateX(0); opacity:0; } 10% { opacity:1; } 90% { opacity:1; } 100% { transform:translateY(-100vh) translateX(100px); opacity:0; } }
-
-    /* Фикс скролла */
-    .container::-webkit-scrollbar { width:6px; }
-    .container::-webkit-scrollbar-track { background:transparent; }
-    .container::-webkit-scrollbar-thumb { background:rgba(177,78,255,0.3); border-radius:3px; }
+    /* Нижняя навигация */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #11111a;
+      border-top: 1px solid #222;
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0 20px;
+    }
+    .nav-item {
+      text-align: center;
+      color: #888;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .nav-item.active {
+      color: #fff;
+    }
+    .nav-item.active::before {
+      content: "";
+      display: block;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #7b5aff, #00c4ff);
+      border-radius: 12px;
+      margin: 0 auto 6px;
+      padding: 6px;
+    }
+    .nav-icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
   </style>
 </head>
 <body>
-  <div class="container" id="app">
-    <h1>GiftUp Soft</h1>
 
-    <!-- Коэффициенты -->
-    <div class="tab active" id="tab-coeff">
-      <div class="mode-grid">
-        <div class="mode-btn easy" onclick="selectMode('easy')">
-          <div class="mode-icon"><i class="fas fa-feather"></i></div>
-          <div class="mode-title">Лёгкий режим</div>
-          <div class="mode-desc">Маленькие, но точные иксы</div>
-        </div>
-        <div class="mode-btn medium" onclick="selectMode('medium')">
-          <div class="mode-icon"><i class="fas fa-balance-scale"></i></div>
-          <div class="mode-title">Средний режим</div>
-          <div class="mode-desc">Средние иксы, более высокий риск (рекомендуется)</div>
-        </div>
-        <div class="mode-btn hard" onclick="selectMode('hard')">
-          <div class="mode-icon"><i class="fas fa-fire"></i></div>
-          <div class="mode-title">Хард режим</div>
-          <div class="mode-desc">Высокие иксы, большой риск</div>
-        </div>
-        <div class="mode-btn impossible" onclick="selectMode('impossible')">
-          <div class="mode-icon"><i class="fas fa-infinity"></i></div>
-          <div class="mode-title">Невозможный режим</div>
-          <div class="mode-desc">Огромные иксы, гигантский риск</div>
-        </div>
-      </div>
-      <div id="prediction-result"></div>
-      <button class="start-btn" onclick="startPrediction()">Начать предсказание</button>
-      <div id="coeff-error" class="error"></div>
-    </div>
-
-    <!-- Профиль -->
-    <div class="tab" id="tab-profile">
-      <div class="card">
-        <div class="avatar" id="user-avatar"></div>
-        <div class="profile-grid">
-          <div class="profile-label">ID:</div><div class="profile-value" id="user-id">-</div>
-          <div class="profile-label">Username:</div><div class="profile-value" id="user-username">-</div>
-          <div class="profile-label">Display Name:</div><div class="profile-value" id="user-display">-</div>
-          <div class="profile-label">Статус подписки:</div><div class="profile-value" id="user-substatus">Неактивна</div>
-        </div>
+  <!-- Топбар -->
+  <div class="topbar">
+    <div class="user-info">
+      <img id="userAvatar" class="avatar" src="" alt="avatar" />
+      <div>
+        <span id="userName" class="username">Загрузка...</span>
+        <span class="level">1</span>
       </div>
     </div>
 
-    <!-- Подписка -->
-    <div class="tab" id="tab-sub">
-      <div class="sub-tabs">
-        <button class="sub-tab-btn active" onclick="openSubTab('activate')">Активировать ключ</button>
-        <button class="sub-tab-btn" onclick="openSubTab('buy')">Запрос на покупку</button>
-        <button class="sub-tab-btn" onclick="openSubTab('rates')">Тарифы</button>
+    <div class="balance-row">
+      <div class="coins">
+        <span id="userCoins">0</span> 🪙
       </div>
-
-      <div class="sub-content active" id="sub-activate">
-        <div class="card">
-          <div class="input-group">
-            <input type="text" id="key-input" placeholder="Введите ключ" />
-          </div>
-          <button class="btn" onclick="activateKey()">Активировать</button>
-          <div id="activate-error" class="error"></div>
-        </div>
-      </div>
-
-      <div class="sub-content" id="sub-buy">
-        <div class="card glow">
-          <p style="text-align:center; font-size:1.1em; margin-bottom:20px;">Запрос на покупку софта в поддержку</p>
-          <div class="support-btn" onclick="openSupport()">
-            <i class="fas fa-headset"></i> Связаться с поддержкой
-          </div>
-        </div>
-      </div>
-
-      <div class="sub-content" id="sub-rates">
-        <div class="tariff green card">
-          <h3>Зелёный тариф</h3>
-          <p>Доступ к среднему и Хард режимам. Более низкая точность иксов чем на высоких тарифах.</p>
-          <div class="accuracy">Точность иксов: 70-75%</div>
-          <div class="duration-grid">
-            <div class="duration">3 дня — Хотите купить софт на проверку?<br><span class="duration-btn" onclick="requestSupport('Зелёный тариф — 3 дня')">Запросить</span></div>
-            <div class="duration">10 дней — Продлите подписку!<br><span class="duration-btn" onclick="requestSupport('Зелёный тариф — 10 дней')">Запросить</span></div>
-            <div class="duration">1 месяц — Без забот!<br><span class="duration-btn" onclick="requestSupport('Зелёный тариф — 1 месяц')">Запросить</span></div>
-            <div class="duration">Навсегда — Лайф-тайм!<br><span class="duration-btn" onclick="requestSupport('Зелёный тариф — Навсегда')">Запросить</span></div>
-          </div>
-        </div>
-
-        <div class="tariff yellow card">
-          <h3>Жёлтый тариф</h3>
-          <p>Доступ к Лёгкому, Среднему режимам! Средняя точность иксов.</p>
-          <div class="accuracy">Точность иксов: 75-85%</div>
-          <div class="duration-grid">
-            <div class="duration">3 дня<br><span class="duration-btn" onclick="requestSupport('Жёлтый тариф — 3 дня')">Запросить</span></div>
-            <div class="duration">10 дней<br><span class="duration-btn" onclick="requestSupport('Жёлтый тариф — 10 дней')">Запросить</span></div>
-            <div class="duration">1 месяц<br><span class="duration-btn" onclick="requestSupport('Жёлтый тариф — 1 месяц')">Запросить</span></div>
-            <div class="duration">Навсегда<br><span class="duration-btn" onclick="requestSupport('Жёлтый тариф — Навсегда')">Запросить</span></div>
-          </div>
-        </div>
-
-        <div class="tariff red card">
-          <h3>Красный тариф</h3>
-          <p>Доступ к Лёгкому, Среднему, Хард режимам! Высокая точность.</p>
-          <div class="accuracy">Точность иксов: 85-90%</div>
-          <div class="duration-grid">
-            <div class="duration">3 дня<br><span class="duration-btn" onclick="requestSupport('Красный тариф — 3 дня')">Запросить</span></div>
-            <div class="duration">10 дней<br><span class="duration-btn" onclick="requestSupport('Красный тариф — 10 дней')">Запросить</span></div>
-            <div class="duration">1 месяц<br><span class="duration-btn" onclick="requestSupport('Красный тариф — 1 месяц')">Запросить</span></div>
-            <div class="duration">Навсегда<br><span class="duration-btn" onclick="requestSupport('Красный тариф — Навсегда')">Запросить</span></div>
-          </div>
-        </div>
-
-        <div class="tariff purple card glow">
-          <h3>Фиолетовый тариф</h3>
-          <p>Доступ ко всем режимам, максимальная точность иксов!</p>
-          <div class="accuracy">Точность иксов: 90-95%</div>
-          <div class="duration-grid">
-            <div class="duration">3 дня<br><span class="duration-btn" onclick="requestSupport('Фиолетовый тариф — 3 дня')">Запросить</span></div>
-            <div class="duration">10 дней<br><span class="duration-btn" onclick="requestSupport('Фиолетовый тариф — 10 дней')">Запросить</span></div>
-            <div class="duration">1 месяц<br><span class="duration-btn" onclick="requestSupport('Фиолетовый тариф — 1 месяц')">Запросить</span></div>
-            <div class="duration">Навсегда<br><span class="duration-btn" onclick="requestSupport('Фиолетовый тариф — Навсегда')">Запросить</span></div>
-          </div>
-        </div>
-      </div>
+      <div class="btn-plus">+</div>
     </div>
 
-    <!-- Админка -->
-    <div class="tab" id="tab-admin">
-      <div class="card glow">
-        <h2 style="text-align:center; color:var(--purple-glow); margin-bottom:20px;">Личный кабинет</h2>
-        <div class="admin-panel">
-          <h3>Генерация ключей</h3>
-          <select id="admin-tariff">
-            <option value="green">Зелёный тариф</option>
-            <option value="yellow">Жёлтый тариф</option>
-            <option value="red">Красный тариф</option>
-            <option value="purple">Фиолетовый тариф</option>
-          </select>
-          <select id="admin-duration">
-            <option value="3d">3 дня</option>
-            <option value="10d">10 дней</option>
-            <option value="1m">1 месяц</option>
-            <option value="forever">Навсегда</option>
-          </select>
-          <button onclick="generateKey()">Создать ключ</button>
-          <input type="text" id="generated-key" placeholder="Сгенерированный ключ" readonly />
-        </div>
-
-        <div class="admin-panel" style="margin-top:30px;">
-          <h3>Чаты с пользователями</h3>
-          <div id="user-chats"></div>
-        </div>
+    <div class="daily-bonus">
+      <div class="daily-text">
+        <div>ПОПОЛНИТЬ БАЛАНС</div>
+        <div style="font-size:13px;opacity:0.7;">+10 ⭐</div>
       </div>
+      <div class="daily-btn">ЗАБРАТЬ</div>
     </div>
   </div>
 
-  <!-- Нижняя панель -->
-  <div class="tab-bar" id="tab-bar">
-    <button class="tab-btn active" onclick="openTab('tab-coeff')"><i class="fas fa-chart-line"></i><span>Коэффициенты</span></button>
-    <button class="tab-btn" onclick="openTab('tab-profile')"><i class="fas fa-user"></i><span>Профиль</span></button>
-    <button class="tab-btn" onclick="openTab('tab-sub')"><i class="fas fa-key"></i><span>Подписка</span></button>
-    <button class="tab-btn" id="admin-tab-btn" style="display:none;" onclick="openTab('tab-admin')"><i class="fas fa-cog"></i><span>Админ</span></button>
+  <!-- Заголовок -->
+  <h1 class="title">ИГРЫ</h1>
+
+  <!-- Рулетка -->
+  <div class="game-card" onclick="alert('Рулетка скоро будет!')">
+    <div class="online-badge">113 ОНЛАЙН</div>
+    <div style="position:absolute;top:20px;right:-40px;transform:rotate(20deg);">
+      <img src="https://i.ibb.co/7zY7Y3k/wheel.png" width="280" style="opacity:0.9;" />
+    </div>
+    <div class="game-name">Рулетка</div>
+  </div>
+
+  <!-- Ракетка (SOON) -->
+  <div class="game-card soon">
+    <div class="soon-badge">SOON</div>
+    <div style="position:absolute;bottom:0;right:20px;">
+      <img src="https://i.ibb.co/09T4n5Q/rocket.png" width="140" />
+    </div>
+    <div class="game-name">Ракетка</div>
+  </div>
+
+  <!-- Нижняя навигация -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <div class="nav-icon">♦</div>
+      <div>ИГРАТЬ</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">🎁</div>
+      <div>ИНВЕНТАРЬ</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">👤</div>
+      <div>ПРОФИЛЬ</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">📋</div>
+      <div>ЗАДАНИЯ</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">👑</div>
+      <div>РЕЙТИНГ</div>
+    </div>
   </div>
 
   <script>
-    const ADMIN_ID = 8223197188;
-    let user = {};
-    let subscription = { active: false, tariff: null, until: null, modes: [] };
-    let selectedMode = null;
-    const keysDB = [];
-    const chatsDB = {}; // userId -> { messages: [], blockedUntil: null }
+    // Telegram WebApp
+    const tg = window.Telegram.WebApp;
+    tg.ready();
 
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
+    // Подтягиваем данные пользователя
+    const user = tg.initDataUnsafe.user;
 
-    function initUser() {
-      user = Telegram.WebApp.initDataUnsafe.user || {};
-      document.getElementById('user-id').textContent = user.id || '-';
-      document.getElementById('user-username').textContent = user.username ? '@'+user.username : '-';
-      document.getElementById('user-display').textContent = [user.first_name, user.last_name].filter(Boolean).join(' ') || '-';
-
-      const avatar = document.getElementById('user-avatar');
+    if (user) {
+      document.getElementById("userName").textContent = user.username || user.first_name || "Player";
+      
+      // Аватарка (если есть фото в initDataUnsafe)
       if (user.photo_url) {
-        avatar.style.backgroundImage = `url(${user.photo_url})`;
-        avatar.style.backgroundSize = 'cover';
+        document.getElementById("userAvatar").src = user.photo_url;
       } else {
-        avatar.style.backgroundColor = '#808080'; // Серая ава
-        avatar.textContent = ''; // Без вопросика
+        // Заглушка, если фотки нет
+        document.getElementById("userAvatar").src = "https://i.ibb.co/0jZ7Y3k/default-avatar.png";
       }
 
-      updateSubStatus();
-      if (user.id == ADMIN_ID) {
-        document.getElementById('admin-tab-btn').style.display = 'flex';
-        setInterval(updateChats, 3000);
-      }
+      // Можно добавить баланс из твоего бэка позже
+      document.getElementById("userCoins").textContent = "0";
     }
 
-    function updateSubStatus() {
-      const el = document.getElementById('user-substatus');
-      if (!subscription.active) {
-        el.textContent = 'Неактивна';
-        el.style.color = '#ff6b6b';
-      } else {
-        const daysLeft = subscription.until === 'forever' ? 'Навсегда' : Math.ceil((new Date(subscription.until) - Date.now()) / 86400000) + ' дн.';
-        el.textContent = `${subscription.tariff.toUpperCase()} — ${daysLeft}`;
-        el.style.color = {green:'#00ff9d',yellow:'#ffd700',red:'#ff3b5f',purple:'#b14eff'}[subscription.tariff];
-      }
-    }
-
-    function canAccessMode(mode) {
-      if (!subscription.active) return false;
-      const access = {
-        green: ['medium','hard'],
-        yellow: ['easy','medium'],
-        red: ['easy','medium','hard'],
-        purple: ['easy','medium','hard','impossible']
-      };
-      return access[subscription.tariff]?.includes(mode) || false;
-    }
-
-    function selectMode(mode) {
-      if (!canAccessMode(mode)) {
-        document.getElementById('coeff-error').textContent = 'Нет доступа к этому режиму!';
-        return;
-      }
-      selectedMode = mode;
-      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector(`.mode-btn.${mode}`).classList.add('active');
-      document.getElementById('coeff-error').textContent = '';
-    }
-
-    function startPrediction() {
-      const err = document.getElementById('coeff-error');
-      err.textContent = '';
-      if (!subscription.active) {
-        err.textContent = 'Нет активной подписки!';
-        return;
-      }
-      if (!selectedMode) {
-        err.textContent = 'Выберите режим!';
-        return;
-      }
-      if (!canAccessMode(selectedMode)) {
-        err.textContent = 'Нет доступа к этому режиму!';
-        return;
-      }
-
-      const ranges = { easy:[1.1,1.5], medium:[1.5,3], hard:[3,10], impossible:[10,100] };
-      const [min,max] = ranges[selectedMode];
-      const x = (Math.random()*(max-min)+min).toFixed(2);
-      document.getElementById('prediction-result').textContent = `x${x}`;
-
-      for(let i=0; i<15; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = Math.random()*100 + '%';
-        p.style.animationDelay = Math.random()*2 + 's';
-        document.body.appendChild(p);
-        setTimeout(() => p.remove(), 4000);
-      }
-    }
-
-    function activateKey() {
-      const key = document.getElementById('key-input').value.trim();
-      const err = document.getElementById('activate-error');
-      err.textContent = '';
-      const found = keysDB.find(k => k.key === key && !k.used);
-      if (!found) {
-        err.textContent = 'Неверный или использованный ключ!';
-        return;
-      }
-      found.used = true;
-      subscription.active = true;
-      subscription.tariff = found.tariff;
-      subscription.until = found.until;
-      updateSubStatus();
-      err.textContent = 'Ключ активирован!';
-      err.style.color = '#00ff9d';
-      document.getElementById('key-input').value = '';
-    }
-
-    function generateKey() {
-      if (user.id != ADMIN_ID) return;
-      const tariff = document.getElementById('admin-tariff').value;
-      const dur = document.getElementById('admin-duration').value;
-      const days = { '3d':3, '10d':10, '1m':30, forever:null };
-      const until = days[dur] ? new Date(Date.now() + days[dur]*86400000).toISOString() : 'forever';
-      const key = btoa(Math.random()).slice(0,16).replace(/[^A-Z0-9]/g,'').toUpperCase();
-      keysDB.push({ key, tariff, until, used:false });
-      document.getElementById('generated-key').value = key;
-    }
-
-    function openSupport() {
-      Telegram.WebApp.openTelegramLink('https://t.me/GiftUpSoftSupBot');
-    }
-
-    function requestSupport(tariff) {
-      Telegram.WebApp.openTelegramLink('https://t.me/GiftUpSoftSupBot?start=' + encodeURIComponent(tariff));
-    }
-
-    function updateChats() {
-      if (user.id != ADMIN_ID) return;
-      // Имитация получения чатов
-      const chatsEl = document.getElementById('user-chats');
-      chatsEl.innerHTML = '';
-      Object.keys(chatsDB).forEach(uid => {
-        const chat = chatsDB[uid];
-        if (chat.messages.length === 0) return;
-        const div = document.createElement('div');
-        div.className = 'chat-item';
-        div.innerHTML = `
-          <div class="chat-user">@${chat.messages[0].username || uid}</div>
-          <div class="chat-msg">${chat.messages[chat.messages.length-1].text}</div>
-          <div class="chat-actions">
-            <button onclick="replyTo(${uid})" style="background:#00ff9d;color:#000;">Ответить</button>
-            <button onclick="blockUser(${uid})" style="background:#ff6b6b;">Заблокировать</button>
-            <button onclick="muteUser(${uid})" style="background:#ffd700;color:#000;">Ограничить</button>
-          </div>
-        `;
-        chatsEl.appendChild(div);
-      });
-    }
-
-    function replyTo(uid) {
-      const msg = prompt("Ваш ответ:");
-      if (msg) {
-        Telegram.WebApp.sendData(JSON.stringify({ type: 'admin_reply', to: uid, message: msg }));
-      }
-    }
-
-    function blockUser(uid) {
-      if (confirm("Заблокировать навсегда?")) {
-        chatsDB[uid].blockedUntil = 'forever';
-      }
-    }
-
-    function muteUser(uid) {
-      const time = prompt("Ограничить на (чч:мм:сс):", "00:05:00");
-      if (time) {
-        const [h,m,s] = time.split(':').map(Number);
-        const ms = (h*3600 + m*60 + s)*1000;
-        chatsDB[uid].blockedUntil = Date.now() + ms;
-      }
-    }
-
-    Telegram.WebApp.onEvent('dataReceived', (data) => {
-      try {
-        const msg = JSON.parse(data);
-        if (msg.type === 'support') {
-          const uid = msg.user.id;
-          if (!chatsDB[uid]) chatsDB[uid] = { messages: [], blockedUntil: null };
-          if (chatsDB[uid].blockedUntil && (chatsDB[uid].blockedUntil === 'forever' || Date.now() < chatsDB[uid].blockedUntil)) {
-            Telegram.WebApp.sendData(JSON.stringify({ type: 'blocked', to: uid }));
-            return;
-          }
-          chatsDB[uid].messages.push({ text: msg.message, username: msg.user.username, time: new Date() });
-        }
-      } catch(e) {}
-    });
-
-    function openTab(tabId) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      document.querySelector(`.tab-btn[onclick="openTab('${tabId}')"]`)?.classList.add('active');
-    }
-
-    function openSubTab(subId) {
-      document.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
-      document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('sub-'+subId).classList.add('active');
-      document.querySelector(`.sub-tab-btn[onclick="openSubTab('${subId}')"]`).classList.add('active');
-    }
-
-    window.onload = () => {
-      initUser();
-    };
+    // Растягиваем веб-апп на весь экран
+    tg.expand();
   </script>
 </body>
 </html>
