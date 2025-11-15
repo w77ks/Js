@@ -3,210 +3,198 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Liquid Glass Mini App</title>
+  <title>Monochrome Mini App</title>
 
-  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Heroicons (outline) -->
+  <script src="https://cdn.jsdelivr.net/npm/heroicons@2.1.1/24/outline/index.min.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #000;
+      color: #fff;
       min-height: 100vh;
-      color: white;
       overflow-x: hidden;
     }
 
-    /* Жидкое стекло — главная карточка */
-    .glass-card {
-      margin: 20px;
-      margin-top: 50px;
-      background: rgba(255, 255, 255, 0.15);
+    /* Liquid glass в чёрно-белом */
+    .glass {
+      background: rgba(255,255,255,0.06);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 28px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-      position: relative;
-      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
 
-    .glass-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-      pointer-events: none;
+    .container {
+      padding: 20px;
+      padding-top: 60px;
+      padding-bottom: 100px;
     }
 
-    /* Профиль */
-    .profile {
+    .profile-card {
+      margin: 0 16px 24px 16px;
+      padding: 32px 24px;
       text-align: center;
-      margin-bottom: 30px;
     }
 
     .avatar {
-      width: 100px;
-      height: 100px;
+      width: 96px; height: 96px;
       border-radius: 50%;
-      border: 4px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      margin-bottom: 16px;
+      border: 3px solid rgba(255,255,255,0.2);
       object-fit: cover;
+      margin-bottom: 20px;
+      background: #111;
     }
 
     .username {
-      font-size: 24px;
-      font-weight: 700;
+      font-size: 22px;
+      font-weight: 600;
       margin-bottom: 8px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      letter-spacing: -0.5px;
     }
 
     .first-visit {
-      font-size: 14px;
-      opacity: 0.8;
-      margin-bottom: 30px;
+      font-size: 13px;
+      opacity: 0.6;
+      margin-bottom: 32px;
     }
 
-    /* Кнопка покупки */
     .buy-btn {
-      display: block;
-      width: 100%;
+      width: calc(100% - 32px);
+      margin: 0 16px;
       padding: 16px;
-      background: linear-gradient(90deg, #ff6b6b, #f46060);
-      color: white;
-      font-size: 18px;
+      background: #fff;
+      color: #000;
+      font-size: 17px;
       font-weight: 600;
       border: none;
       border-radius: 16px;
       cursor: pointer;
-      box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
-      transition: all 0.3s ease;
-      margin-top: 10px;
+      transition: all 0.25s ease;
     }
 
     .buy-btn:active {
       transform: translateY(2px);
-      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+      background: #eee;
     }
 
     /* Нижняя навигация */
     .bottom-nav {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(0, 0, 0, 0.15);
+      bottom: 0; left: 0; right: 0;
+      height: 84px;
+      background: rgba(0,0,0,0.4);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 12px 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
       display: flex;
       justify-content: space-around;
+      align-items: center;
       z-index: 1000;
     }
 
     .nav-item {
       text-align: center;
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 12px;
+      color: rgba(255,255,255,0.5);
       transition: all 0.3s;
     }
 
     .nav-item.active {
-      color: white;
-      font-weight: 600;
-      transform: scale(1.1);
+      color: #fff;
     }
 
-    .nav-icon {
-      font-size: 24px;
+    .nav-item.active svg { stroke: #fff; fill: none; }
+    .nav-item svg {
+      width: 28px; height: 28px;
+      stroke: currentColor;
+      stroke-width: 1.8;
       margin-bottom: 4px;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      font-weight: 500;
     }
   </style>
 </head>
 <body>
 
-  <div class="glass-card">
-    <div class="profile">
-      <img id="userAvatar" class="avatar" src="" alt="Avatar">
-      <div class="username" id="userName">Загрузка...</div>
-      <div class="first-visit" id="firstVisit">Первый вход: <span id="visitDate">—</span></div>
+  <div class="container">
+    <div class="glass profile-card">
+      <img id="userAvatar" class="avatar" src="" alt="">
+      <div class="username" id="userName">—</div>
+      <div class="first-visit">Первый вход: <span id="visitDate">—</span></div>
     </div>
 
-    <button class="buy-btn" onclick="buyAccess()">
-      Купить доступ
-    </button>
+    <button class="buy-btn" onclick="buyAccess()">Купить доступ</button>
   </div>
 
-  <!-- Нижняя навигация (пока только активная вкладка "Главное меню") -->
+  <!-- Нижняя навигация (только иконки, без эмодзи) -->
   <div class="bottom-nav">
     <div class="nav-item active">
-      <div class="nav-icon">🏠</div>
-      <div>Главное меню</div>
+      <svg><use href="#home"></use></svg>
+      <div class="nav-label">Главная</div>
     </div>
     <div class="nav-item">
-      <div class="nav-icon">⚙️</div>
-      <div>Настройки</div>
+      <svg><use href="#cog-6-tooth"></use></svg>
+      <div class="nav-label">Настройки</div>
     </div>
     <div class="nav-item">
-      <div class="nav-icon">ℹ️</div>
-      <div>О приложении</div>
+      <svg><use href="#information-circle"></use></svg>
+      <div class="nav-label">Инфо</div>
     </div>
   </div>
 
   <script>
-    // Инициализация Telegram WebApp
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
 
-    const user = Telegram.WebApp.initDataUnsafe.user;
+    const user = Telegram.WebApp.initDataUnsafe.user || {};
 
-    // Заполняем данные пользователя
-    document.getElementById('userName').textContent = 
-      user?.first_name + (user?.last_name ? ' ' + user.last_name : '') || 'Пользователь';
+    // Имя
+    document.getElementById('userName').textContent =
+      `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Пользователь';
 
-    // Аватар (если есть фото в initDataUnsafe)
-    if (user?.photo_url) {
+    // Аватар
+    if (user.photo_url) {
       document.getElementById('userAvatar').src = user.photo_url;
     } else {
-      // Заглушка с первым букв имени
       const canvas = document.createElement('canvas');
-      canvas.width = 100; canvas.height = 100;
+      canvas.width = canvas.height = 96;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff33';
-      ctx.fillRect(0, 0, 100, 100);
-      ctx.font = 'bold 40px Inter';
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = '#222';
+      ctx.fillRect(0,0,96,96);
+      ctx.font = 'bold 36px Inter';
+      ctx.fillStyle = '#fff';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText((user?.first_name?.[0] || '?').toUpperCase(), 50, 50);
+      ctx.fillText((user.first_name?.[0] || '?').toUpperCase(), 48, 48);
       document.getElementById('userAvatar').src = canvas.toDataURL();
     }
 
-    // Дата первого захода (берём из localStorage или текущую)
-    const firstVisit = localStorage.getItem('firstVisit');
+    // Дата первого входа
+    const saved = localStorage.getItem('firstVisit');
     const now = new Date();
-    const dateStr = now.toLocaleDateString('ru-RU', { year: 'numeric', month: '2-digit', day: '2-digit' }).split('.').reverse().join('.') + 
-                    ', ' + now.toTimeString().slice(0,8);
+    const dateStr = now.getFullYear() + '.' + 
+      String(now.getMonth()+1).padStart(2,'0') + '.' + 
+      String(now.getDate()).padStart(2,'0') + ', ' + 
+      now.toTimeString().slice(0,8);
 
-    if (!firstVisit) {
-      localStorage.setItem('firstVisit', dateStr);
-      document.getElementById('visitDate').textContent = dateStr;
-    } else {
-      document.getElementById('visitDate').textContent = firstVisit;
-    }
+    const displayDate = saved || dateStr;
+    if (!saved) localStorage.setItem('firstVisit', dateStr);
+    document.getElementById('visitDate').textContent = displayDate;
 
-    // Функция покупки (пока просто пример)
     function buyAccess() {
       Telegram.WebApp.showPopup({
         title: "Покупка доступа",
-        message: "Скоро здесь будет оплата через Telegram Stars или TON",
-        buttons: [{ type: "ok" }]
+        message: "В ближайшее время будет доступна оплата",
+        buttons: [{type: "ok"}]
       });
     }
   </script>
