@@ -7,96 +7,74 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/feather-icons"></script>
 
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDqZ8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8",
+      authDomain: "premium-mini-app-2025.firebaseapp.com",
+      projectId: "premium-mini-app-2025",
+      storageBucket: "premium-mini-app-2025.firebasestorage.app",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abcdef1234567890"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.db = db;
+    window.collection = collection;
+    window.doc = doc;
+    window.setDoc = setDoc;
+    window.getDocs = getDocs;
+    window.deleteDoc = deleteDoc;
+    window.query = query;
+    window.where = where;
+    window.serverTimestamp = serverTimestamp;
+  </script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; overflow-x: hidden; }
+    * { margin:0; padding:0; box-sizing:border-box; transition:all .4s ease; }
+    body { font-family:'Inter',sans-serif; background:#0a0a0a; color:#fff; min-height:100vh; overflow-x:hidden; }
 
-    .glow-bg {
-      position: fixed; inset: 0; pointer-events: none;
-      background: radial-gradient(circle at 50% 25%, rgba(255,255,255,0.15) 0%, transparent 70%);
-      animation: pulse 6s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.95; transform: scale(1.1); } }
+    .glow-bg { position:fixed; inset:0; pointer-events:none; background:radial-gradient(circle at 50% 25%,rgba(255,255,255,0.15)0%,transparent 70%); animation:pulse 6s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:.5;transform:scale(1)}50%{opacity:.95;transform:scale(1.1)} }
 
-    .container { padding: 20px; padding-top: 60px; padding-bottom: 100px; position: relative; z-index: 1; }
+    .container { padding:20px; padding-top:60px; padding-bottom:100px; position:relative; z-index:1; }
 
-    .tab { display: none; opacity: 0; transition: opacity 0.35s ease; }
-    .tab.active { display: block; opacity: 1; }
+    .tab { opacity:0; transform:translateY(20px); transition:all .6s ease; pointer-events:none; }
+    .tab.active { opacity:1; transform:none; pointer-events:all; }
 
-    .profile-card {
-      margin: 0 16px 32px; padding: 40px 24px; text-align: center;
-      background: rgba(255,255,255,0.07); backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.12); border-radius: 24px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
-      transition: all 0.4s ease;
-    }
-    .profile-card:hover { transform: translateY(-8px); }
+    .profile-card { margin:0 16px 32px; padding:40px 24px; text-align:center; background:rgba(255,255,255,0.07); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.12); border-radius:24px; box-shadow:0 12px 40px rgba(0,0,0,0.6); }
+    .avatar { width:100px; height:100px; border-radius:50%; border:3px solid rgba(255,255,255,0.3); object-fit:cover; margin-bottom:20px; background:#111; }
 
-    .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); object-fit: cover; margin-bottom: 20px; background: #111; }
-    .username { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
-    .first-visit { font-size: 13px; opacity: 0.7; margin-bottom: 20px; }
+    .btn { width:calc(100%-32px); margin:16px; padding:18px; background:#fff; color:#000; font-size:17px; font-weight:600; border:none; border-radius:16px; cursor:pointer; }
+    .btn-red { background:#ff4444; color:#fff; }
 
-    .btn {
-      width: calc(100% - 32px); margin: 0 16px 16px; padding: 18px;
-      background: #fff; color: #000; font-size: 17px; font-weight: 600;
-      border: none; border-radius: 16px; cursor: pointer; transition: all 0.25s;
-    }
-    .btn:active { transform: translateY(2px); background: #eee; }
-    .btn-red { background: #ff4444; color: #fff; }
+    .setting-item { margin:0 16px 12px; padding:18px 20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:16px; display:flex; align-items:center; justify-content:space-between; gap:16px; font-size:16px; }
+    .switch { position:relative; width:52px; height:32px; background:#333; border-radius:32px; cursor:pointer; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; inset:0; background:#666; border-radius:32px; transition:.4s; }
+    .slider:before { position:absolute; content:""; height:26px; width:26px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.4s; }
+    input:checked + .slider { background:#00ff88; }
+    input:checked + .slider:before { transform:translateX(20px); }
 
-    .setting-item, .topic-item {
-      margin: 0 16px 12px; padding: 18px 20px;
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px; display: flex; align-items: center; gap: 16px; font-size: 16px;
-    }
-    .setting-item i, .topic-item i { font-size: 24px; opacity: 0.8; }
-    .soon-text { margin: 30px 16px; text-align: center; font-size: 13px; opacity: 0.5; }
+    .user-list { margin:0 16px; }
+    .user-item { padding:16px; background:rgba(255,255,255,0.06); border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
 
-    .faq-item { margin: 0 16px 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; }
-    .faq-question { padding: 18px 20px; font-size: 16px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-    .faq-question::after { content: "+"; font-size: 24px; transition: transform 0.3s; }
-    .faq-question.active::after { transform: rotate(45deg); }
-    .faq-answer { padding: 0 20px; max-height: 0; overflow: hidden; transition: all 0.4s ease; font-size: 14px; line-height: 1.5; opacity: 0.8; }
-    .faq-answer.active { padding: 0 20px 20px; max-height: 300px; }
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:84px; background:rgba(15,15,15,0.95); backdrop-filter:blur(20px); border-top:1px solid rgba(255,255,255,0.08); display:flex; z-index:1000; }
+    .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:rgba(255,255,255,0.5); cursor:pointer; transform:translateY(20px); opacity:0; transition:all .6s ease; }
+    .nav-item.visible { transform:none; opacity:1; }
+    .nav-item.active { color:#fff; }
+    .nav-item i { font-size:26px; margin-bottom:4px; }
 
-    .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 16px 20px; }
-    .admin-btn { padding: 16px; text-align: center; background: rgba(255,255,255,0.08); border-radius: 12px; font-size: 14px; }
-
-    .modal {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
-      display: none; align-items: center; justify-content: center; z-index: 1000;
-      opacity: 0; transition: opacity 0.3s ease;
-    }
-    .modal.active { display: flex; opacity: 1; }
-    .modal-content {
-      background: #111; padding: 32px; border-radius: 20px; width: 90%; max-width: 360px;
-      text-align: center; border: 1px solid rgba(255,255,255,0.1); position: relative;
-    }
-    .close-btn {
-      position: absolute; top: 12px; right: 16px; font-size: 28px; cursor: pointer;
-      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-      border-radius: 50%; background: rgba(255,255,255,0.1); transition: 0.3s;
-    }
-    .close-btn:hover { background: rgba(255,255,255,0.2); }
-    .modal input {
-      width: 100%; padding: 16px; margin: 16px 0; background: #222; border: none;
-      border-radius: 12px; color: #fff; font-size: 18px; text-align: center;
-    }
-
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; height: 84px;
-      background: rgba(15,15,15,0.95); backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255,255,255,0.08);
-      display: flex; z-index: 1000;
-    }
-    .nav-item {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      color: rgba(255,255,255,0.5); transition: all 0.3s; cursor: pointer;
-    }
-    .nav-item.active { color: #fff; }
-    .nav-item i { font-size: 26px; margin-bottom: 4px; }
-    .nav-label { font-size: 11px; font-weight: 500; }
+    .modal { position:fixed; inset:0; background:rgba(0,0,0,0.9); backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; z-index:1000; opacity:0; transition:opacity .4s; }
+    .modal.active { display:flex; opacity:1; }
+    .modal-content { background:#111; padding:32px; border-radius:20px; width:90%; max-width:360px; text-align:center; position:relative; }
+    .close-btn { position:absolute; top:12px; right:16px; font-size:28px; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(255,255,255,0.1); }
   </style>
 </head>
 <body>
@@ -104,274 +82,228 @@
   <div class="glow-bg"></div>
 
   <div class="container">
-    <!-- Вкладка "Главная" - только до активации -->
-    <div id="tab-home" class="tab">
+    <!-- Главная (до подписки) -->
+    <div id="tab-home" class="tab active">
       <div class="profile-card">
-        <img id="userAvatar" class="avatar" src="" alt="Avatar">
-        <div class="username" id="userName">Загрузка...</div>
-        <div class="first-visit">Первый вход: <span id="visitDate">—</span></div>
+        <img id="avatar1" class="avatar" src="">
+        <div class="username" id="name1">—</div>
+        <div class="first-visit">Первый вход: <span id="visit1">—</span></div>
       </div>
       <button class="btn" onclick="openKeyModal()">Активировать ключ</button>
     </div>
 
-    <!-- Вкладка "Настройки" - после активации -->
+    <!-- Настройки (после подписки) -->
     <div id="tab-settings" class="tab">
       <div class="profile-card">
-        <img id="userAvatar2" class="avatar" src="" alt="Avatar">
-        <div class="username" id="userName2">Загрузка...</div>
-        <div class="first-visit">Первый вход: <span id="visitDate2">—</span></div>
+        <img id="avatar2" class="avatar" src="">
+        <div class="username" id="name2">—</div>
+        <div class="first-visit">Подписка активна до: <span id="expiresDate">—</span></div>
       </div>
-      <div class="setting-item"><i data-feather="lock"></i> Конфиденциальность</div>
-      <div class="setting-item"><i data-feather="user-check"></i> Наставники</div>
+      <div class="setting-item" onclick="switchTab('tab-privacy', this)">Конфиденциальность →</div>
+      <div class="setting-item"><i data-feather="user-check"></i> Наставники (скоро)</div>
       <div class="setting-item"><i data-feather="help-circle"></i> Поддержка</div>
-      <div class="soon-text">Скоро больше функций...</div>
     </div>
 
-    <!-- Вкладка "Темы" - после активации -->
+    <!-- Конфиденциальность -->
+    <div id="tab-privacy" class="tab">
+      <h2 style="margin:0 16px 20px">Настройки анонимности</h2>
+      <div class="setting-item">
+        Скрыть профиль полностью
+        <label class="switch"><input type="checkbox" id="hideAll"><span class="slider"></span></label>
+      </div>
+      <div class="setting-item">
+        Скрыть только аватарку
+        <label class="switch"><input type="checkbox" id="hideAvatar"><span class="slider"></span></label>
+      </div>
+      <div class="setting-item">
+        Скрыть только ник
+        <label class="switch"><input type="checkbox" id="hideName"><span class="slider"></span></label>
+      </div>
+    </div>
+
+    <!-- Темы -->
     <div id="tab-themes" class="tab">
-      <h2 style="margin:0 16px 20px; font-size:20px;">Темы</h2>
-      <div class="topic-item"><i data-feather="message-square"></i> Общение <span style="margin-left:auto; opacity:0.6;">0 сообщений</span></div>
-      <div class="topic-item"><i data-feather="volume-2"></i> Объявления <span style="margin-left:auto; opacity:0.6;">0 сообщений</span></div>
-      <div class="topic-item"><i data-feather="code"></i> Разработка <span style="margin-left:auto; opacity:0.6;">0 сообщений</span></div>
-      <div class="topic-item"><i data-feather="film"></i> Медиа <span style="margin-left:auto; opacity:0.6;">0 сообщений</span></div>
+      <h2 style="margin:0 16px 20px">Темы</h2>
+      <div class="topic-item"><i data-feather="message-square"></i> Общение <span style="margin-left:auto;opacity:0.6;">0 сообщений</span></div>
+      <div class="topic-item"><i data-feather="volume-2"></i> Объявления <span style="margin-left:auto;opacity:0.6;">0 сообщений</span></div>
     </div>
 
-    <!-- Вкладка "Инфо" - всегда доступна -->
+    <!-- Инфо (исчезает после подписки) -->
     <div id="tab-info" class="tab">
-      <h2 style="margin:0 16px 20px; font-size:20px;">FAQ</h2>
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">Почему платная проходка?</div>
-        <div class="faq-answer">Мы потратили много времени, денег и много чего другого для создания мануалов, кода, программ. Вдобавок, мы отдаём 70% от профитов вам. Нам и так это не очень выгодно. Пожалуйста, поймите что несмотря насколько тима большая, мы не можем отдавать проходку бесплатно.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">Что входит в подписку?</div>
-        <div class="faq-answer">Мануалы, программы для скама, бесплатные наставники и другое.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">Можно ли подать заявку на наставника?</div>
-        <div class="faq-answer">Да. Вы можете подать заявку на наставника что бы получать 10% от профитов своих учеников. Минимальные требования: Активная подписка, 10 профитов.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">Как отвязать своего наставника?</div>
-        <div class="faq-answer">Ваш наставник автоматически отвязывается после первых 5 профитов. Но так же, вы можете отвязать его вручную по кнопку "Покинуть наставника".</div>
-      </div>
+      <h2 style="text-align:center; margin:60px 20px">FAQ и информация</h2>
     </div>
 
-    <!-- Вкладка "Подписка" - всегда доступна -->
+    <!-- Подписка (исчезает после активации) -->
     <div id="tab-sub" class="tab">
-      <h2 style="text-align:center; margin:60px 20px; opacity:0.7; font-size:18px;">
-        Скоро здесь будет магазин подписок<br><br>
-        <small style="font-size:14px; opacity:0.5;">Оплата через Telegram Stars</small>
-      </h2>
+      <h2 style="text-align:center; margin:60px 20px; opacity:0.7">Магазин подписок — скоро</h2>
     </div>
 
-    <!-- Вкладка "Админ" - только для админа -->
+    <!-- Админ-панель -->
     <div id="tab-admin" class="tab">
-      <h2 style="margin:0 16px 20px; font-size:20px;">Админ-панель</h2>
-      <div class="admin-grid">
-        <button class="admin-btn" onclick="generateKey(3)">3 дня</button>
-        <button class="admin-btn" onclick="generateKey(5)">5 дней</button>
-        <button class="admin-btn" onclick="generateKey(10)">10 дней</button>
-        <button class="admin-btn" onclick="generateKey(30)">30 дней</button>
-        <button class="admin-btn" onclick="generateKey(9999)">Навсегда</button>
-        <button class="admin-btn btn-red" onclick="resetSubscription()">Отключить подписку (тест)</button>
-      </div>
-      <div id="lastKeyDisplay" style="margin:20px 16px; padding:16px; background:rgba(0,255,0,0.1); border-radius:12px; text-align:center; font-family:monospace; font-size:18px; display:none;"></div>
+      <h2 style="margin:0 16px 20px">Активные подписки</h2>
+      <div id="usersList" class="user-list">Загрузка...</div>
+      <button class="btn btn-red" onclick="location.reload()">Обновить список</button>
     </div>
   </div>
 
-  <!-- Модальное окно для активации ключа -->
+  <!-- Модалка -->
   <div class="modal" id="keyModal">
     <div class="modal-content">
       <div class="close-btn" onclick="closeModal()">×</div>
       <h3>Активация ключа</h3>
       <input type="text" id="keyInput" placeholder="XXXXXX" maxlength="6">
       <button class="btn" onclick="activateKey()">Активировать</button>
-      <p style="margin-top:20px; opacity:0.7;">
-        Нет ключа? 
-        <a href="#" onclick="closeModal(); switchTab('tab-sub', document.getElementById('subNav'))" style="color:#fff; text-decoration:underline;">
-          Приобрести ключ для проходки
-        </a>
+      <p style="margin-top:20px; opacity:0.7">
+        Нет ключа? <a href="#" onclick="closeModal(); switchTab('tab-sub')">Приобрести</a>
       </p>
     </div>
   </div>
 
-  <!-- Нижняя навигация -->
-  <div class="bottom-nav">
-    <div class="nav-item active" id="homeNav" onclick="switchTab('tab-home', this)">
-      <i data-feather="home"></i>
-      <div class="nav-label">Главная</div>
-    </div>
-    <div class="nav-item" id="settingsNav" onclick="switchTab('tab-settings', this)" style="display:none;">
-      <i data-feather="settings"></i>
-      <div class="nav-label">Настройки</div>
-    </div>
-    <div class="nav-item" id="themesNav" onclick="switchTab('tab-themes', this)" style="display:none;">
-      <i data-feather="grid"></i>
-      <div class="nav-label">Темы</div>
-    </div>
-    <div class="nav-item" id="infoNav" onclick="switchTab('tab-info', this)">
-      <i data-feather="info"></i>
-      <div class="nav-label">Инфо</div>
-    </div>
-    <div class="nav-item" id="subNav" onclick="switchTab('tab-sub', this)">
-      <i data-feather="shopping-cart"></i>
-      <div class="nav-label">Подписка</div>
-    </div>
-    <div class="nav-item" id="adminNav" onclick="switchTab('tab-admin', this)" style="display:none;">
-      <i data-feather="shield"></i>
-      <div class="nav-label">Админ</div>
-    </div>
+  <!-- Навигация -->
+  <div class="bottom-nav" id="nav">
+    <div class="nav-item active" id="nav-home" onclick="switchTab('tab-home')"><i data-feather="home"></i><div class="nav-label">Главная</div></div>
+    <div class="nav-item" id="nav-settings" onclick="switchTab('tab-settings')"><i data-feather="settings"></i><div class="nav-label">Настройки</div></div>
+    <div class="nav-item" id="nav-themes" onclick="switchTab('tab-themes')"><i data-feather="grid"></i><div class="nav-label">Темы</div></div>
+    <div class="nav-item" id="nav-info" onclick="switchTab('tab-info')"><i data-feather="info"></i><div class="nav-label">Инфо</div></div>
+    <div class="nav-item" id="nav-sub" onclick="switchTab('tab-sub')"><i data-feather="shopping-cart"></i><div class="nav-label">Подписка</div></div>
+    <div class="nav-item" id="nav-admin" onclick="switchTab('tab-admin')"><i data-feather="shield"></i><div class="nav-label">Админ</div></div>
   </div>
 
-  <script>
-    const APP_VERSION = "v3.1"; // Изменяй это при каждом обновлении кода — сбросит подписки у всех
-
+  <script type="module">
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
-    feather.replace(); // Инициализация иконок
+    feather.replace();
 
-    // Сброс подписки и ключей при обновлении версии
-    if (localStorage.getItem('appVersion') !== APP_VERSION) {
-      localStorage.removeItem('subscription');
-      localStorage.removeItem('generatedKeys');
-      localStorage.setItem('appVersion', APP_VERSION);
+    const user = Telegram.WebApp.initDataUnsafe.user;
+    const isAdmin = user.id === 8223197188;
+
+    // Анимация появления навигации
+    function showNavItems() {
+      const items = document.querySelectorAll('.nav-item');
+      items.forEach((el, i) => {
+        setTimeout(() => el.classList.add('visible'), i * 100);
+      });
     }
 
-    const user = Telegram.WebApp.initDataUnsafe.user || {};
-    const isAdmin = (user.id === 8223197188 || user.username === 'Xanezy');
-    if (isAdmin) {
-      document.getElementById('adminNav').style.display = 'flex';
-    }
-
-    // Заполнение профиля (дублируем для обеих вкладок)
-    function fillProfile() {
-      const name = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Пользователь';
-      document.getElementById('userName').textContent = name;
-      document.getElementById('userName2').textContent = name;
-
-      const avatar = user.photo_url || ( () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = canvas.height = 100;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#1a1a1a';
-        ctx.fillRect(0, 0, 100, 100);
-        ctx.font = 'bold 40px Inter';
-        ctx.fillStyle = '#fff';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText((user.first_name?.[0] || '?').toUpperCase(), 50, 50);
-        return canvas.toDataURL();
-      })();
-      document.getElementById('userAvatar').src = avatar;
-      document.getElementById('userAvatar2').src = avatar;
-
-      let saved = localStorage.getItem('firstVisit');
-      const now = new Date();
-      const dateStr = now.getFullYear() + '.' + String(now.getMonth() + 1).padStart(2, '0') + '.' + String(now.getDate()).padStart(2, '0') + ', ' + now.toTimeString().slice(0, 8);
-      if (!saved) {
-        saved = dateStr;
-        localStorage.setItem('firstVisit', saved);
-      }
-      document.getElementById('visitDate').textContent = saved;
-      document.getElementById('visitDate2').textContent = saved;
-    }
-    fillProfile();
-
-    // Проверка подписки и обновление интерфейса
-    function checkSubscription() {
-      const sub = localStorage.getItem('subscription');
-      if (sub) {
-        const { expires } = JSON.parse(sub);
-        if (expires === 'forever' || Date.now() < expires) {
-          // Скрываем "Главная"
-          document.getElementById('homeNav').style.display = 'none';
-          // Показываем "Настройки" и "Темы"
-          document.getElementById('settingsNav').style.display = 'flex';
-          document.getElementById('themesNav').style.display = 'flex';
-          // Активируем "Настройки" по умолчанию
-          switchTab('tab-settings', document.getElementById('settingsNav'));
-          return true;
-        }
-      }
-      // Без подписки — показываем "Главная"
-      document.getElementById('settingsNav').style.display = 'none';
-      document.getElementById('themesNav').style.display = 'none';
-      switchTab('tab-home', document.getElementById('homeNav'));
-      return false;
-    }
-    checkSubscription();
-
-    // Функция переключения вкладок
-    function switchTab(tabId, el) {
-      // Деактивируем все вкладки
+    // Переключение вкладок с анимацией
+    window.switchTab = async function(id) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      // Активируем выбранную
-      const tab = document.getElementById(tabId);
-      if (tab) tab.classList.add('active');
-      // Деактивируем все нави
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      // Активируем выбранную navi
-      if (el) el.classList.add('active');
+      document.getElementById(id).classList.add('active');
+      document.querySelector(`[onclick="switchTab('${id}')"]`)?.parentElement.classList.add('active');
+
+      if (id === 'tab-admin' && isAdmin) await loadActiveUsers();
+      if (id === 'tab-privacy') loadPrivacySettings();
+    };
+
+    // Дата окончания подписки
+    function formatExpires(expires) {
+      if (expires === 'forever') return 'Навсегда';
+      const d = new Date(expires);
+      return d.toLocaleString('ru-RU');
     }
 
-    // Функция для FAQ аккордеона
-    function toggleFaq(el) {
-      el.classList.toggle('active');
-      const answer = el.nextElementSibling;
-      answer.classList.toggle('active');
-      answer.style.maxHeight = answer.classList.contains('active') ? answer.scrollHeight + 'px' : null;
+    // Проверка и применение подписки
+    async function checkAndApplySubscription() {
+      const q = query(collection(db, "users"), where("userId", "==", user.id));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        const data = snap.docs[0].data();
+        const expires = data.expires === 'forever' ? 'forever' : data.expires.toMillis();
+
+        document.getElementById('expiresDate').textContent = formatExpires(expires);
+
+        // Убираем ненужные вкладки
+        document.getElementById('nav-home').style.display = 'none';
+        document.getElementById('nav-info').style.display = 'none';
+        document.getElementById('nav-sub').style.display = 'none';
+
+        document.getElementById('nav-settings').classList.add('visible');
+        document.getElementById('nav-themes').classList.add('visible');
+        if (isAdmin) document.getElementById('nav-admin').classList.add('visible');
+
+        switchTab('tab-settings');
+      } else {
+        document.getElementById('nav-settings').style.display = 'none';
+        document.getElementById('nav-themes').style.display = 'none';
+        document.getElementById('nav-admin').style.display = 'none';
+      }
+      showNavItems();
     }
 
-    // Открытие модалки
-    function openKeyModal() {
-      document.getElementById('keyModal').classList.add('active');
-      document.getElementById('keyInput').value = '';
-    }
+    // Загрузка активных пользователей в админку
+    window.loadActiveUsers = async function() {
+      const list = document.getElementById('usersList');
+      list.innerHTML = '';
+      const snap = await getDocs(collection(db, "users"));
+      snap.forEach(doc => {
+        const u = doc.data();
+        const item = document.createElement('div');
+        item.className = 'user-item';
+        item.innerHTML = `
+          <div>@${u.username || '—no username—'} (${u.firstName || u.userId})<br>
+            <small>до ${formatExpires(u.expires === 'forever' ? 'forever' : u.expires.toMillis())}</small>
+          </div>
+          <button class="btn-red" style="padding:8px 12px;font-size:14px;" onclick="revoke('${doc.id}')">Отключить</button>
+        `;
+        list.appendChild(item);
+      });
+    };
 
-    // Закрытие модалки
-    function closeModal() {
-      document.getElementById('keyModal').classList.remove('active');
-    }
-
-    // Генерация ключа
-    function generateKey(days) {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let key = '';
-      for (let i = 0; i < 6; i++) key += chars[Math.floor(Math.random() * chars.length)];
-      const expires = days >= 9999 ? 'forever' : Date.now() + days * 24 * 60 * 60 * 1000;
-      const keyData = { key, expires, used: false };
-      let keys = JSON.parse(localStorage.getItem('generatedKeys') || '[]');
-      keys.push(keyData);
-      localStorage.setItem('generatedKeys', JSON.stringify(keys));
-      document.getElementById('lastKeyDisplay').textContent = key;
-      document.getElementById('lastKeyDisplay').style.display = 'block';
-      navigator.clipboard.writeText(key).then(() => Telegram.WebApp.showAlert('Ключ скопирован: ' + key));
-    }
+    window.revoke = async function(id) {
+      if (confirm('Отключить подписку?')) {
+        await deleteDoc(doc(db, "users", id));
+        loadActiveUsers();
+      }
+    };
 
     // Активация ключа
-    function activateKey() {
-      const input = document.getElementById('keyInput').value.toUpperCase().trim();
-      if (input.length !== 6) return Telegram.WebApp.showAlert('Ключ должен быть 6 символов');
-      let keys = JSON.parse(localStorage.getItem('generatedKeys') || '[]');
-      const keyObj = keys.find(k => k.key === input && !k.used);
-      if (!keyObj) return Telegram.WebApp.showAlert('Неверный или использованный ключ');
-      keyObj.used = true;
-      localStorage.setItem('generatedKeys', JSON.stringify(keys));
-      localStorage.setItem('subscription', JSON.stringify({ expires: keyObj.expires }));
-      closeModal();
-      Telegram.WebApp.showAlert('Ключ активирован!');
-      setTimeout(() => location.reload(), 1000);
-    }
+    window.activateKey = async function() {
+      const key = document.getElementById('keyInput').value.trim().toUpperCase();
+      if (key.length !== 6) return alert('Ключ — 6 символов');
 
-    // Отключение подписки (для админа)
-    function resetSubscription() {
-      if (!isAdmin) return;
-      localStorage.removeItem('subscription');
-      Telegram.WebApp.showAlert('Подписка отключена');
+      // Здесь потом будет проверка ключа на сервере. Пока просто 30 дней для теста:
+      const expires = Date.now() + 30*24*60*60*1000;
+
+      await setDoc(doc(db, "users", user.id.toString()), {
+        userId: user.id,
+        username: user.username || null,
+        firstName: user.first_name,
+        expires: expires,
+        created: serverTimestamp()
+      }, { merge: true });
+
+      closeModal();
       location.reload();
+    };
+
+    // Настройки анонимности
+    function loadPrivacySettings() {
+      const settings = JSON.parse(localStorage.getItem('privacy') || '{}');
+      document.getElementById('hideAll').checked = settings.hideAll || false;
+      document.getElementById('hideAvatar').checked = settings.hideAvatar || false;
+      document.getElementById('hideName').checked = settings.hideName || false;
     }
+    document.querySelectorAll('#tab-privacy input').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const s = {
+          hideAll: document.getElementById('hideAll').checked,
+          hideAvatar: document.getElementById('hideAvatar').checked,
+          hideName: document.getElementById('hideName').checked
+        };
+        localStorage.setItem('privacy', JSON.stringify(s));
+      });
+    });
+
+    window.openKeyModal = () => document.getElementById('keyModal').classList.add('active');
+    window.closeModal = () => document.getElementById('keyModal').classList.remove('active');
+
+    // Профиль
+    const avatarUrl = user.photo_url || 'https://via.placeholder.com/100/333/fff?text=' + (user.first_name?.[0] || '?');
+    document.querySelectorAll('.avatar').forEach(img => img.src = avatarUrl);
+    document.querySelectorAll('.username').forEach(el => el.textContent = user.first_name || 'Пользователь');
+
+    checkAndApplySubscription();
   </script>
 </body>
 </html>
-
