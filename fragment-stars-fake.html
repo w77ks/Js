@@ -10,7 +10,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.5s ease; }
-    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; overflow-x: hidden; }
+    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
 
     .glow-bg {
       position: fixed; inset: 0; pointer-events: none;
@@ -19,7 +19,7 @@
     }
     @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.95; transform: scale(1.1); } }
 
-    .container { padding: 20px; padding-top: 60px; padding-bottom: 100px; position: relative; z-index: 1; }
+    .container { padding: 20px; padding-top: 60px; padding-bottom: 100px; position: relative; z-index: 1; min-height: calc(100vh - 160px); }
 
     .tab { display: none; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
     .tab.active { display: block; opacity: 1; transform: translateY(0); }
@@ -76,13 +76,6 @@
     }
     .topic-item i { font-size: 24px; opacity: 0.8; }
 
-    /* Симуляция чата в темах */
-    .chat-message { margin: 10px 16px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px; }
-    .chat-message.anonymous .avatar, .chat-message.anonymous .username { display: none; }
-    .chat-message .avatar { width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; }
-    .chat-message .username { font-weight: 600; margin-right: 10px; cursor: pointer; }
-    .chat-message.no-profile .username { cursor: default; }
-
     .faq-item { margin: 0 16px 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; }
     .faq-question { padding: 18px 20px; font-size: 16px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s; }
     .faq-question:hover { background: rgba(255,255,255,0.08); }
@@ -105,10 +98,10 @@
     .modal input:focus { background: #333; }
 
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 84px; background: rgba(15,15,15,0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.08); display: flex; z-index: 1000; transition: all 0.5s ease; }
-    .nav-item { flex: 1; text-align: center; color: rgba(255,255,255,0.5); transition: all 0.5s ease; cursor: pointer; opacity: 1; transform: translateY(0); }
+    .nav-item { flex: 1; text-align: center; color: rgba(255,255,255,0.5); transition: all 0.5s ease; cursor: pointer; opacity: 1; transform: translateY(0); display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .nav-item.active { color: #fff; }
-    .nav-item.hidden { opacity: 0; transform: translateY(50px); flex: 0; width: 0; }
-    .nav-item i { font-size: 24px; margin-bottom: 4px; display: block; }
+    .nav-item.hidden { opacity: 0; transform: translateY(50px); flex: 0; width: 0; overflow: hidden; }
+    .nav-item i { font-size: 24px; margin-bottom: 4px; }
     .nav-label { font-size: 11px; font-weight: 500; }
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -139,7 +132,7 @@
         <div class="first-visit">Первый вход: <span id="visitDate2">—</span></div>
         <div class="sub-status" id="subStatus">Ваша подписка активна до —</div>
       </div>
-      <div class="setting-item" id="privacyItem" onclick="toggleSubSettings('privacy')">
+      <div class="setting-item" onclick="togglePrivacy()">
         <i data-feather="lock"></i> Конфиденциальность
       </div>
       <div class="sub-setting" id="privacySettings">
@@ -150,34 +143,29 @@
             <span class="slider"></span>
           </label>
         </div>
-        <h4>Настройки анонимности</h4>
-        <div class="sub-setting-item">
-          <span>Скрыть профиль</span>
-          <label class="switch">
-            <input type="checkbox" id="hideProfile" onclick="saveAnonSettings()">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="sub-setting-item">
-          <span>Скрыть аватарку</span>
-          <label class="switch">
-            <input type="checkbox" id="hideAvatar" onclick="saveAnonSettings()">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="sub-setting-item">
-          <span>Скрыть ник</span>
-          <label class="switch">
-            <input type="checkbox" id="hideNick" onclick="saveAnonSettings()">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="sub-setting-item">
-          <span>Скрыть всё</span>
-          <label class="switch">
-            <input type="checkbox" id="hideAll" onclick="saveAnonSettings()">
-            <span class="slider"></span>
-          </label>
+        <div id="anonOptions" style="display:none;">
+          <h4>Настройки анонимности</h4>
+          <div class="sub-setting-item">
+            <span>Скрыть профиль</span>
+            <label class="switch">
+              <input type="checkbox" id="hideProfile" onclick="saveAnonSettings()">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="sub-setting-item">
+            <span>Скрыть аватарку</span>
+            <label class="switch">
+              <input type="checkbox" id="hideAvatar" onclick="saveAnonSettings()">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="sub-setting-item">
+            <span>Скрыть ник</span>
+            <label class="switch">
+              <input type="checkbox" id="hideNick" onclick="saveAnonSettings()">
+              <span class="slider"></span>
+            </label>
+          </div>
         </div>
       </div>
       <div class="setting-item"><i data-feather="user-check"></i> Наставники</div>
@@ -192,11 +180,6 @@
       <div class="topic-item"><i data-feather="volume-2"></i> Объявления <span style="margin-left:auto; opacity:0.6;">0 сообщений</span></div>
       <div class="topic-item"><i data-feather="code"></i> Разработка <span style="margin-left:auto; opacity:0.6;">0 сообщений</span></div>
       <div class="topic-item"><i data-feather="film"></i> Медиа <span style="margin-left:auto; opacity:0.6;">0 сообщений</span></div>
-      <div class="chat-message" id="chatExample">
-        <img class="avatar" src="" alt="">
-        <span class="username">Пользователь</span>
-        Пример сообщения
-      </div>
     </div>
 
     <!-- Инфо -->
@@ -288,7 +271,7 @@
   </div>
 
   <script>
-    const APP_VERSION = "v3.2"; // Изменяй для сброса подписок
+    const APP_VERSION = "v3.3"; // Изменяй для сброса подписок
 
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
@@ -341,7 +324,7 @@
     }
     fillProfile();
 
-    // Проверка подписки и плавное обновление интерфейса
+    // Проверка подписки
     function checkSubscription() {
       const sub = localStorage.getItem('subscription');
       if (sub) {
@@ -384,7 +367,7 @@
     }
     checkSubscription();
 
-    // Переключение вкладок с анимацией
+    // Переключение вкладок
     function switchTab(tabId, el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       const tab = document.getElementById(tabId);
@@ -396,9 +379,9 @@
       if (el) el.classList.add('active');
     }
 
-    // Тоггл поднастроек
-    function toggleSubSettings(id) {
-      const settings = document.getElementById(id + 'Settings');
+    // Тоггл конфиденциальности
+    function togglePrivacy() {
+      const settings = document.getElementById('privacySettings');
       settings.classList.toggle('active');
     }
 
@@ -406,6 +389,7 @@
     function toggleAnon() {
       const isAnon = document.getElementById('anonSwitch').checked;
       localStorage.setItem('anonEnabled', isAnon);
+      document.getElementById('anonOptions').style.display = isAnon ? 'block' : 'none';
       updateChatAnon();
     }
 
@@ -414,8 +398,7 @@
       const settings = {
         hideProfile: document.getElementById('hideProfile').checked,
         hideAvatar: document.getElementById('hideAvatar').checked,
-        hideNick: document.getElementById('hideNick').checked,
-        hideAll: document.getElementById('hideAll').checked
+        hideNick: document.getElementById('hideNick').checked
       };
       localStorage.setItem('anonSettings', JSON.stringify(settings));
       updateChatAnon();
@@ -425,35 +408,19 @@
     function loadAnonSettings() {
       const anonEnabled = localStorage.getItem('anonEnabled') === 'true';
       document.getElementById('anonSwitch').checked = anonEnabled;
+      document.getElementById('anonOptions').style.display = anonEnabled ? 'block' : 'none';
 
       const settings = JSON.parse(localStorage.getItem('anonSettings')) || {};
       document.getElementById('hideProfile').checked = settings.hideProfile || false;
       document.getElementById('hideAvatar').checked = settings.hideAvatar || false;
       document.getElementById('hideNick').checked = settings.hideNick || false;
-      document.getElementById('hideAll').checked = settings.hideAll || false;
 
       updateChatAnon();
     }
 
-    // Обновление симуляции чата с анонимностью
+    // Обновление симуляции чата (но без примера сообщения)
     function updateChatAnon() {
-      const chat = document.getElementById('chatExample');
-      chat.classList.remove('anonymous', 'no-profile');
-      const settings = JSON.parse(localStorage.getItem('anonSettings')) || {};
-      const isAnon = document.getElementById('anonSwitch').checked;
-
-      if (isAnon) {
-        chat.classList.add('anonymous');
-        if (settings.hideProfile) chat.classList.add('no-profile');
-        if (settings.hideAll) {
-          chat.querySelector('.avatar').style.display = 'none';
-          chat.querySelector('.username').style.display = 'none';
-          chat.classList.add('no-profile');
-        } else {
-          if (settings.hideAvatar) chat.querySelector('.avatar').style.display = 'none';
-          if (settings.hideNick) chat.querySelector('.username').style.display = 'none';
-        }
-      }
+      // Здесь будет логика для реального чата, но пока пусто
     }
 
     // Тоггл FAQ
