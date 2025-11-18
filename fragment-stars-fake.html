@@ -45,11 +45,7 @@
     }
     .tab.active { display: block; opacity: 1; transform: translateY(0); }
 
-    /* Только эти две вкладки могут скроллиться */
-    #tab-settings, #tab-info {
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
+    #tab-settings, #tab-info { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
     .profile-card {
       margin: 0 16px 32px; padding: 40px 24px; text-align: center;
@@ -74,7 +70,7 @@
       border-radius: 16px; display: flex; align-items: center; gap: 16px;
       font-size: 16px; font-weight: 500; cursor: pointer;
     }
-    .topic-item span, .faq-question span { margin-left: auto; opacity: 0.6; }
+    .topic-item span { margin-left: auto; opacity: 0.6; }
 
     .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
@@ -158,8 +154,7 @@
           <div id="anonOptions" style="display:none;">
             <h4 style="margin:20px 0 10px; opacity:0.8;">Настройки анонимности</h4>
             <div class="sub-setting-item">
-              <span>Убрать возможность перехода по профилю
-
+              <span>Скрыть профиль</span>
               <label class="switch"><input type="checkbox" id="hideProfile" onclick="saveAnonSettings()"><span class="slider"></span></label>
             </div>
             <div class="sub-setting-item">
@@ -178,7 +173,7 @@
         <div style="height:200px;"></div>
       </div>
 
-      <!-- Темы (без скролла) -->
+      <!-- Темы -->
       <div id="tab-themes" class="tab">
         <h2 style="margin:0 16px 20px; font-size:20px;">Темы</h2>
         <div class="topic-item"><i data-feather="message-square"></i> Общение <span>0 сообщений</span></div>
@@ -187,28 +182,28 @@
         <div class="topic-item"><i data-feather="film"></i> Медиа <span>0 сообщений</span></div>
       </div>
 
-      <!-- Инфо (скроллится) -->
+      <!-- Инфо -->
       <div id="tab-info" class="tab">
         <h2 style="margin:0 16px 20px; font-size:20px;">FAQ</h2>
         <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">Бр бр порно?</div>
-          <div class="faq-answer">Бр бр порно</div>
+          <div class="faq-question" onclick="toggleFaq(this)">Как работает приложение?</div>
+          <div class="faq-answer">Ответ на вопрос...</div>
         </div>
         <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">Бр бр порно?</div>
-          <div class="faq-answer">Бр бр порно.</div>
+          <div class="faq-question" onclick="toggleFaq(this)">Что входит в подписку?</div>
+          <div class="faq-answer">Доступ ко всем темам, анонимность, поддержка и т.д.</div>
         </div>
         <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">Бр бр порно</div>
-          <div class="faq-answer">Бр бр порно.</div>
+          <div class="faq-question" onclick="toggleFaq(this)">Как оплатить?</div>
+          <div class="faq-answer">Пока только через ключи от админа.</div>
         </div>
         <div class="faq-item">
-          <div class="faq-question" onclick="toggleFaq(this)">Бр бр порно</div>
-          <div class="faq-answer">Бр бр порно</div>
+          <div class="faq-question" onclick="toggleFaq(this)">Где взять поддержку?</div>
+          <div class="faq-answer">Пиши @твой_ник</div>
         </div>
       </div>
 
-      <!-- Подписка (без скролла) -->
+      <!-- Подписка -->
       <div id="tab-sub" class="tab">
         <h2 style="text-align:center; margin:60px 20px; opacity:0.7; font-size:18px;">
           Скоро здесь будет магазин подписок<br><br>
@@ -216,7 +211,7 @@
         </h2>
       </div>
 
-      <!-- Админ (без скролла) -->
+      <!-- Админ -->
       <div id="tab-admin" class="tab">
         <h2 style="margin:0 16px 20px; font-size:20px;">Админ-панель</h2>
         <div class="admin-grid">
@@ -229,9 +224,9 @@
         </div>
         <div id="lastKeyDisplay" style="margin:20px 16px;padding:16px;background:rgba(0,255,0,0.1);border-radius:12px;text-align:center;font-family:monospace;font-size:18px;display:none;"></div>
       </div>
+
     </div>
 
-    <!-- Нижняя навигация -->
     <div class="bottom-nav">
       <div class="nav-item active" id="homeNav" onclick="switchTab('tab-home', this)"><i data-feather="home"></i><div class="nav-label">Главная</div></div>
       <div class="nav-item" id="settingsNav" onclick="switchTab('tab-settings', this)" style="display:none;"><i data-feather="settings"></i><div class="nav-label">Настройки</div></div>
@@ -242,13 +237,18 @@
     </div>
   </div>
 
-  <!-- Модалка ключа -->
   <div class="modal" id="keyModal">
     <div class="modal-content">
       <div class="close-btn" onclick="closeModal()">×</div>
       <h3>Активация ключа</h3>
       <input type="text" id="keyInput" placeholder="XXXXXX" maxlength="6">
       <button class="btn" onclick="activateKey()">Активировать</button>
+      <p style="margin-top:20px; opacity:0.7;">
+        Нет ключа? 
+        <a href="#" onclick="closeModal(); switchTab('tab-sub', document.getElementById('subNav'))" style="color:#fff; text-decoration:underline;">
+          Приобрести ключ для проходки
+        </a>
+      </p>
     </div>
   </div>
 
@@ -256,9 +256,16 @@
     const APP_VERSION = "v5.0";
     Telegram.WebApp.ready(); Telegram.WebApp.expand(); feather.replace();
 
+    const PB_URL = "http://127.0.0.1:8090/api"; // Замени на ngrok, если нужно
     const user = Telegram.WebApp.initDataUnsafe.user || {};
     const isAdmin = (user.id === 8223197188 || user.username === 'Xanezy');
     if (isAdmin) document.getElementById('adminNav').style.display = 'flex';
+
+    // Сброс версии
+    if (localStorage.getItem('appVersion') !== APP_VERSION) {
+      localStorage.removeItem('subscription');
+      localStorage.setItem('appVersion', APP_VERSION);
+    }
 
     // Профиль
     function fillProfile() {
@@ -285,11 +292,12 @@
     fillProfile();
 
     // Проверка подписки
-    function checkSubscription() {
+    async function checkSubscription() {
       const sub = localStorage.getItem('subscription');
       if (sub) {
         const { expires } = JSON.parse(sub);
         if (expires === 'forever' || Date.now() < expires) {
+          // Анимация исчезновения
           document.getElementById('infoNav').style.animation = 'slideOutBottom 0.5s forwards';
           document.getElementById('subNav').style.animation = 'slideOutBottom 0.5s forwards';
           setTimeout(() => {
@@ -319,7 +327,7 @@
     }
     checkSubscription();
 
-    // Переключение вкладок
+    // Переключение
     function switchTab(id, el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       const tab = document.getElementById(id);
@@ -330,36 +338,28 @@
       if (el) el.classList.add('active');
     }
 
-    function togglePrivacy() {
-      document.getElementById('privacySettings').classList.toggle('active');
-    }
-
+    // Анонимность
+    function togglePrivacy() { document.getElementById('privacySettings').classList.toggle('active'); }
     function toggleAnon() {
       const on = document.getElementById('anonSwitch').checked;
       localStorage.setItem('anonEnabled', on);
       document.getElementById('anonOptions').style.display = on ? 'block' : 'none';
     }
-
     function saveAnonSettings() {
-      const s = {
-        hideProfile: document.getElementById('hideProfile').checked,
-        hideAvatar: document.getElementById('hideAvatar').checked,
-        hideNick: document.getElementById('hideNick').checked
-      };
+      const s = { hideProfile: document.getElementById('hideProfile').checked, hideAvatar: document.getElementById('hideAvatar').checked, hideNick: document.getElementById('hideNick').checked };
       localStorage.setItem('anonSettings', JSON.stringify(s));
     }
-
     function loadAnonSettings() {
       const on = localStorage.getItem('anonEnabled') === 'true';
       document.getElementById('anonSwitch').checked = on;
       document.getElementById('anonOptions').style.display = on ? 'block' : 'none';
-
       const s = JSON.parse(localStorage.getItem('anonSettings') || '{}');
       document.getElementById('hideProfile').checked = s.hideProfile || false;
       document.getElementById('hideAvatar').checked = s.hideAvatar || false;
       document.getElementById('hideNick').checked = s.hideNick || false;
     }
 
+    // FAQ
     function toggleFaq(el) {
       el.classList.toggle('active');
       const ans = el.nextElementSibling;
@@ -367,38 +367,63 @@
       ans.style.maxHeight = ans.classList.contains('active') ? ans.scrollHeight + 'px' : '0';
     }
 
+    // Модалка
     function openKeyModal() { document.getElementById('keyModal').classList.add('active'); }
     function closeModal() { document.getElementById('keyModal').classList.remove('active'); }
 
-    function generateKey(days) {
+    // Генерация ключа (с PocketBase)
+    async function generateKey(days) {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let key = '';
       for (let i = 0; i < 6; i++) key += chars[Math.floor(Math.random() * chars.length)];
-      const expires = days >= 9999 ? 'forever' : Date.now() + days*86400000;
-      const data = { key, expires, used: false };
-      let keys = JSON.parse(localStorage.getItem('generatedKeys') || '[]');
-      keys.push(data);
-      localStorage.setItem('generatedKeys', JSON.stringify(keys));
+
+      // Проверка на дубли
+      const checkRes = await fetch(`${PB_URL}/collections/keys/records?filter=key="${key}"`);
+      const checkData = await checkRes.json();
+      if (checkData.items.length > 0) {
+        Telegram.WebApp.showAlert('Ключ уже существует! Генерирую новый...');
+        return generateKey(days); // Рекурсия для нового ключа
+      }
+
+      const expires = days >= 9999 ? 'forever' : Date.now() + days * 86400000;
+      const data = { key, days, expires: new Date(expires), used: false, used_by: '' };
+      await fetch(`${PB_URL}/collections/keys/records`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
       document.getElementById('lastKeyDisplay').textContent = key;
       document.getElementById('lastKeyDisplay').style.display = 'block';
       navigator.clipboard.writeText(key);
       Telegram.WebApp.showAlert('Ключ скопирован: ' + key);
     }
 
-    function activateKey() {
+    // Активация ключа (с PocketBase)
+    async function activateKey() {
       const input = document.getElementById('keyInput').value.toUpperCase().trim();
       if (input.length !== 6) return Telegram.WebApp.showAlert('Ключ — 6 символов');
-      let keys = JSON.parse(localStorage.getItem('generatedKeys') || '[]');
-      const k = keys.find(x => x.key === input && !x.used);
-      if (!k) return Telegram.WebApp.showAlert('Неверный или использованный ключ');
-      k.used = true;
-      localStorage.setItem('generatedKeys', JSON.stringify(keys));
-      localStorage.setItem('subscription', JSON.stringify({ expires: k.expires }));
+
+      const res = await fetch(`${PB_URL}/collections/keys/records?filter=key="${input}"`);
+      const data = await res.json();
+      if (data.items.length === 0) return Telegram.WebApp.showAlert('Ключ не найден');
+      const keyData = data.items[0];
+      if (keyData.used) return Telegram.WebApp.showAlert('Ключ уже использован');
+
+      const expires = keyData.expires === 'forever' ? 'forever' : new Date(keyData.expires).getTime();
+      // Обновляем в базе
+      await fetch(`${PB_URL}/collections/keys/records/${keyData.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ used: true, used_by: user.id.toString() })
+      });
+
+      localStorage.setItem('subscription', JSON.stringify({ expires }));
       closeModal();
-      Telegram.WebApp.showAlert('Подписка активирована!');
+      Telegram.WebApp.showAlert('Ключ активирован!');
       setTimeout(() => location.reload(), 1200);
     }
 
+    // Отключение подписки
     function resetSubscription() {
       if (!isAdmin) return;
       localStorage.removeItem('subscription');
@@ -408,6 +433,3 @@
   </script>
 </body>
 </html>
-
-
-
