@@ -7,125 +7,103 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { height: 100%; overflow: hidden; background: #0a0a0c; color: #e8e8e8; font-family: -apple-system, system-ui, sans-serif; }
 
-        body {
-            height: 100vh;
-            background: #0d0d0f;
-            color: #e0e0e0;
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow: hidden;
-        }
-
-        .bg-lights {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-        }
-
+        /* Пульсирующие источники света */
+        .bg-lights { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
         .light {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(180, 200, 255, 0.25) 0%, rgba(180, 200, 255, 0) 65%);
-            filter: blur(80px);
-            animation: pulse 10s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(160, 190, 255, 0.22) 0%, transparent 70%);
+            filter: blur(90px);
+            animation: pulse 12s ease-in-out infinite;
         }
-
-        .light:nth-child(1) { width: 600px; height: 600px; top: -200px; left: -200px; animation-delay: 0s; }
-        .light:nth-child(2) { width: 800px; height: 800px; top: 30%; right: -300px; animation-delay: 3.5s; }
-        .light:nth-child(3) { width: 500px; height: 500px; bottom: -150px; left: 10%; animation-delay: 6s; }
-        .light:nth-child(4) { width: 700px; height: 700px; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: 1.8s; opacity: 0.6; }
+        .light:nth-child(1) { width: 700px; height: 700px; top: -250px; left: -200px; animation-delay: 0s; }
+        .light:nth-child(2) { width: 900px; height: 900px; top: 20%; right: -300px; animation-delay: 4s; }
+        .light:nth-child(3) { width: 600px; height: 600px; bottom: -200px; left: 50%; animation-delay: 7s; }
+        .light:nth-child(4) { width: 800px; height: 800px; top: 45%; left: 45%; animation-delay: 2s; opacity: 0.5; }
 
         @keyframes pulse {
-            0%, 100% { opacity: 0.3; transform: scale(0.9); }
-            50% { opacity: 0.7; transform: scale(1.3); }
+            0%, 100% { opacity: 0.25; transform: scale(0.85); }
+            50% { opacity: 0.65; transform: scale(1.25); }
         }
 
-        .container {
-            position: relative;
-            z-index: 1;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
+        .container { position: relative; z-index: 1; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 
         .profile-card {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-radius: 32px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 34px;
             padding: 50px 40px 40px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            max-width: 320px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            max-width: 340px;
             width: 90%;
         }
 
         .avatar {
-            width: 130px;
-            height: 130px;
+            width: 140px; height: 140px;
             border-radius: 50%;
             overflow: hidden;
-            margin: 0 auto 30px;
-            border: 4px solid rgba(255, 255, 255,255,0.25);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+            margin: 0 auto 28px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 40px rgba(180, 200, 255, 0.3);
         }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
         .username {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 700;
-            letter-spacing: 4px;
-            margin-bottom: 12px;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
         }
 
         .first-entry {
-            font-size: 16px;
-            opacity: 0.65;
+            font-size: 15px;
+            opacity: 0.7;
+            letter-spacing: 0.5px;
         }
 
-        .bottom-island {
+        /* Нижняя панель-островок */
+        .bottom-nav {
             position: fixed;
-            bottom: 35px;
+            bottom: 32px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.09);
-            backdrop-filter: blur(26px);
-            -webkit-backdrop-filter: blur(26px);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
             border-radius: 60px;
-            padding: 18px 50px;
+            padding: 20px 56px;
             display: flex;
-            gap: 60px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            z-index: 2;
+            gap: 64px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            z-index: 10;
         }
 
         .nav-item {
-            color: #888;
+            color: #999;
             text-align: center;
             transition: color 0.3s ease;
+            cursor: pointer;
         }
-
-        .nav-item.active {
-            color: #ffffff;
-        }
+        .nav-item.active { color: #ffffff; }
+        .nav-item:hover { color: #ccc; }
 
         .nav-icon {
-            font-size: 34px;
-            margin-bottom: 6px;
+            width: 32px; height: 32px;
+            margin: 0 auto 8px;
+            opacity: 0.8;
         }
+        .nav-item.active .nav-icon { opacity: 1; }
 
         .nav-label {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 500;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -141,76 +119,76 @@
     <div class="container">
         <div class="profile-card">
             <div class="avatar">
-                <img id="avatar-img" src="" alt="Avatar">
+                <img id="user-avatar" src="" alt="Avatar">
             </div>
-            <div class="username" id="username">// @loading //</div>
+            <div class="username" id="user-name">// @loading //</div>
             <div class="first-entry" id="first-entry">Первый вход: загружается…</div>
         </div>
     </div>
 
-    <div class="bottom-island">
+    <!-- Нижняя панель с SVG-иконками -->
+    <div class="bottom-nav">
         <div class="nav-item active">
-            <div class="nav-icon">🏠</div>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
             <div class="nav-label">Главная</div>
         </div>
         <div class="nav-item">
-            <div class="nav-icon">ℹ️</div>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
             <div class="nav-label">Инфо</div>
         </div>
         <div class="nav-item">
-            <div class="nav-icon">🛒</div>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.76 1.38-.24 3.15 1.14 3.95C7.66 18.66 9.38 19 11.1 19h12v-2H11.1l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16h-2v-2h2v2z"/></svg>
             <div class="nav-label">Подписка</div>
         </div>
     </div>
 
     <script>
-        window.addEventListener('load', () => {
-            // Расширяем приложение на весь экран в Telegram
-            if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.Telegram?.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
             }
 
-            const user = (typeof Telegram !== 'undefined' && Telegram.WebApp?.initDataUnsafe?.user) || null;
+            const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+            const avatarEl = document.getElementById('user-avatar');
+            const nameEl = document.getElementById('user-name');
 
-            let username = 'guest';
-            let avatarUrl = 'https://www.pngkey.com/png/full/226-2267923_happy-sunflower-clipart.png'; // красивый улыбающийся подсолнух по умолчанию
+            let displayName = '// @unknown //';
+            let photoUrl = '';
 
             if (user) {
+                // Имя пользователя
                 if (user.username) {
-                    username = '@' + user.username;
+                    displayName = `// @${user.username} //`;
                 } else {
-                    username = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                    displayName = `// ${user.first_name || 'User'} ${user.last_name || ''} //`.trim();
                 }
 
-                // Если у пользователя есть юзернейм — используем его, иначе имя
-                avatarUrl = `https://api.dicebear.com/8.x/avataaars-neutral/svg?seed=${user.id || user.username || 'user'}`;
+                // Реальная аватарка из Telegram (если есть)
+                if (user.photo_url) {
+                    photoUrl = user.photo_url;
+                }
             } else {
-                // Если открыто не в Telegram — показываем как на твоём скрине
-                username = '@XaneZy';
-                avatarUrl = 'https://www.pngkey.com/png/full/226-2267923_happy-sunflower-clipart.png';
+                // Для теста вне Telegram — как на твоём скрине
+                displayName = '// @XaneZy //';
             }
 
-            document.getElementById('username').innerText = `// ${username} //`;
-            document.getElementById('avatar-img').src = avatarUrl;
+            // Если нет настоящей фотки — ставим красивый fallback (подсолнух)
+            if (!photoUrl) {
+                photoUrl = 'https://i.ibb.co/0jKX7YJ/sunflower-avatar.jpg'; // прямой линк на подсолнух
+            }
 
-            // Первый вход — сохраняем только один раз
+            nameEl.textContent = displayName;
+            avatarEl.src = photoUrl;
+
+            // Первый вход
             let firstEntry = localStorage.getItem('firstEntry');
-
             if (!firstEntry) {
                 const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const hour = String(now.getHours()).padStart(2, '0');
-                const minute = String(now.getMinutes()).padStart(2, '0');
-                const second = String(now.getSeconds()).padStart(2, '0');
-
-                firstEntry = `${year}.${month}.${day}, ${hour}:${minute}:${second}`;
+                firstEntry = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}, ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
                 localStorage.setItem('firstEntry', firstEntry);
             }
-
-            document.getElementById('first-entry').innerText = `Первый вход: ${firstEntry}`;
+            document.getElementById('first-entry').textContent = `Первый вход: ${firstEntry}`;
         });
     </script>
 </body>
