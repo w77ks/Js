@@ -5,11 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Liquid Glass Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { height: 100%; overflow: hidden; background: #0a0a0c; color: #e8e8e8; font-family: -apple-system, system-ui, sans-serif; }
 
-        /* Пульсирующие источники света */
+    <!-- Подключаем твой шрифт dityinfant -->
+    <style>
+        @font-face {
+            font-family: 'Dity Infant';
+            src: url('./dityinfant-Regular.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html {
+            height: 100dvh;
+            overflow: hidden;
+            background: #0a0a0c;
+            color: #e8e8e8;
+            font-family: 'Dity Infant', -apple-system, system-ui, sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        /* Пульсирующий свет */
         .bg-lights { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
         .light {
             position: absolute;
@@ -28,7 +45,16 @@
             50% { opacity: 0.65; transform: scale(1.25); }
         }
 
-        .container { position: relative; z-index: 1; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .container {
+            position: relative;
+            z-index: 1;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
         .profile-card {
             background: rgba(255, 255, 255, 0.08);
@@ -40,7 +66,7 @@
             text-align: center;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
             max-width: 340px;
-            width: 90%;
+            width: 92%;
         }
 
         .avatar {
@@ -54,22 +80,21 @@
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
         .username {
-            font-size: 30px;
-            font-weight: 700;
-            letter-spacing: 3px;
+            font-size: 32px;
+            font-weight: 400;
+            letter-spacing: 4px;
             margin-bottom: 10px;
         }
 
         .first-entry {
-            font-size: 15px;
-            opacity: 0.7;
-            letter-spacing: 0.5px;
+            font-size: 16px;
+            opacity: 0.75;
         }
 
-        /* Нижняя панель-островок */
+        /* Адаптивная нижняя панель */
         .bottom-nav {
             position: fixed;
-            bottom: 32px;
+            bottom: max(20px, env(safe-area-inset-bottom, 20px));
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.1);
@@ -77,33 +102,32 @@
             -webkit-backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.16);
             border-radius: 60px;
-            padding: 20px 56px;
+            padding: clamp(14px, 3vw, 20px) clamp(30px, 10vw, 56px);
             display: flex;
-            gap: 64px;
+            gap: clamp(30px, 12vw, 64px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             z-index: 10;
+            max-width: 95vw;
         }
 
         .nav-item {
             color: #999;
             text-align: center;
             transition: color 0.3s ease;
-            cursor: pointer;
+            user-select: none;
         }
         .nav-item.active { color: #ffffff; }
-        .nav-item:hover { color: #ccc; }
+        .nav-item:hover { color: #ddd; }
 
         .nav-icon {
-            width: 32px; height: 32px;
-            margin: 0 auto 8px;
-            opacity: 0.8;
+            width: clamp(26px, 6vw, 34px);
+            height: clamp(26px, 6vw, 34px);
+            margin: 0 auto 6px;
         }
-        .nav-item.active .nav-icon { opacity: 1; }
 
         .nav-label {
-            font-size: 12.5px;
+            font-size: clamp(11px, 3.2vw, 13px);
             font-weight: 500;
-            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -126,18 +150,26 @@
         </div>
     </div>
 
-    <!-- Нижняя панель с SVG-иконками -->
+    <!-- Нижняя панель с новыми иконками -->
     <div class="bottom-nav">
         <div class="nav-item active">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
             <div class="nav-label">Главная</div>
         </div>
+
         <div class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+            </svg>
             <div class="nav-label">Инфо</div>
         </div>
+
         <div class="nav-item">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.76 1.38-.24 3.15 1.14 3.95C7.66 18.66 9.38 19 11.1 19h12v-2H11.1l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16h-2v-2h2v2z"/></svg>
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.76 1.38-.24 3.15 1.14 3.95C7.66 18.66 9.38 19 11.1 19h12v-2H11.1l.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16h-2v-2h2v2z"/>
+            </svg>
             <div class="nav-label">Подписка</div>
         </div>
     </div>
@@ -149,7 +181,7 @@
                 Telegram.WebApp.expand();
             }
 
-            const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+            const user = window.Telegram?.WebApp?.initDataUnsafe?.user || null;
             const avatarEl = document.getElementById('user-avatar');
             const nameEl = document.getElementById('user-name');
 
@@ -157,25 +189,17 @@
             let photoUrl = '';
 
             if (user) {
-                // Имя пользователя
-                if (user.username) {
-                    displayName = `// @${user.username} //`;
-                } else {
-                    displayName = `// ${user.first_name || 'User'} ${user.last_name || ''} //`.trim();
-                }
+                displayName = user.username ? `// @${user.username} //` : `// ${user.first_name || 'User'} ${user.last_name || ''} //`.trim();
 
-                // Реальная аватарка из Telegram (если есть)
                 if (user.photo_url) {
                     photoUrl = user.photo_url;
                 }
             } else {
-                // Для теста вне Telegram — как на твоём скрине
                 displayName = '// @XaneZy //';
             }
 
-            // Если нет настоящей фотки — ставим красивый fallback (подсолнух)
             if (!photoUrl) {
-                photoUrl = 'https://i.ibb.co/0jKX7YJ/sunflower-avatar.jpg'; // прямой линк на подсолнух
+                photoUrl = 'https://i.ibb.co/0jKX7YJ/sunflower-avatar.jpg';
             }
 
             nameEl.textContent = displayName;
@@ -184,8 +208,8 @@
             // Первый вход
             let firstEntry = localStorage.getItem('firstEntry');
             if (!firstEntry) {
-                const now = new Date();
-                firstEntry = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}, ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+                const n = new Date();
+                firstEntry = `${n.getFullYear()}.${String(n.getMonth()+1).padStart(2,'0')}.${String(n.getDate()).padStart(2,'0')}, ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
                 localStorage.setItem('firstEntry', firstEntry);
             }
             document.getElementById('first-entry').textContent = `Первый вход: ${firstEntry}`;
